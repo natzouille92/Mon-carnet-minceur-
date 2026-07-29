@@ -1358,3 +1358,56 @@
     </script>
 </body>
 </html>
+<!-- Bloc de sauvegarde et restauration des données -->
+<div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
+  <h3 style="margin-top: 0; font-size: 16px;">Sauvegarde de vos données</h3>
+  <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+    Téléchargez une sauvegarde avant d'effacer votre historique Safari.
+  </p>
+  
+  <button onclick="exporterDonnees()" style="padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px;">
+    💾 Exporter mes données
+  </button>
+  
+  <br>
+  
+  <label style="padding: 10px 15px; background-color: #2196F3; color: white; border-radius: 5px; cursor: pointer; display: inline-block; font-weight: bold; margin-top: 5px;">
+    📂 Importer une sauvegarde
+    <input type="file" id="importFile" onchange="importerDonnees(event)" style="display: none;" accept=".json">
+  </label>
+</div>
+
+<script>
+function exporterDonnees() {
+  const donnees = JSON.stringify(localStorage);
+  const blob = new Blob([donnees], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `sauvegarde_carnet_${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importerDonnees(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const donnees = JSON.parse(e.target.result);
+      for (let key in donnees) {
+        localStorage.setItem(key, donnees[key]);
+      }
+      alert('✅ Sauvegarde restaurée avec succès ! La page va se recharger.');
+      location.reload();
+    } catch (err) {
+      alert('❌ Erreur lors de la lecture du fichier de sauvegarde.');
+    }
+  };
+  reader.readAsText(file);
+}
+</script>
