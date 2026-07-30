@@ -267,7 +267,6 @@
     }
     .btn-delete { color: #ff0055; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 4px; font-weight: bold; }
 
-    /* STYLES COURBE DE POIDS ET RÉCAP' */
     #chart-container {
       background: #ffffff;
       border-radius: 16px;
@@ -363,14 +362,15 @@
       <p class="welcome-quote">✨ « Manger mieux pour vivre mieux » ✨</p>
     </div>
 
+    <!-- JAUGE DE 1300 KCAL -->
     <div class="calorie-gauge-container">
       <svg class="gauge-svg" viewBox="0 0 100 100">
         <circle class="gauge-bg" cx="50" cy="50" r="40" />
         <circle class="gauge-progress" id="gauge-circle" cx="50" cy="50" r="40" />
       </svg>
       <div class="gauge-info">
-        <div>Consommé : <span id="gauge-consumed">0</span> / <input type="number" id="target-kcal-input" value="1600" style="width:65px; padding:2px 5px;" onchange="updateGauge()"> kcal</div>
-        <div>Restant : <span id="gauge-remaining">1600</span> kcal</div>
+        <div>Consommé : <span id="gauge-consumed">0</span> / <input type="number" id="target-kcal-input" value="1300" style="width:65px; padding:2px 5px;" onchange="updateGauge()"> kcal</div>
+        <div>Restant : <span id="gauge-remaining">1300</span> kcal</div>
       </div>
     </div>
 
@@ -397,11 +397,11 @@
         </div>
       </div>
 
-      <!-- COURBE DE POIDS AVEC DATES -->
+      <!-- GRAPHIC 55KG A 85KG AVEC DATES ET SANS TEXTE SUR LA COURBE -->
       <div class="card">
         <div class="card-title">📈 Évolution du Poids</div>
         <div id="chart-container">
-          <canvas id="weight-chart" width="500" height="250"></canvas>
+          <canvas id="weight-chart" width="500" height="260"></canvas>
         </div>
       </div>
 
@@ -444,7 +444,6 @@
 
   </div>
 
-  <!-- POPUP ALIMENT INCONNU -->
   <div class="modal-overlay" id="add-food-modal">
     <div class="modal-card">
       <h3 style="color:var(--fuchsia-bright); margin-top:0;">Aliment Inconnu 🌸</h3>
@@ -740,7 +739,7 @@
         });
       });
 
-      const target = parseFloat(document.getElementById('target-kcal-input').value) || 1600;
+      const target = parseFloat(document.getElementById('target-kcal-input').value) || 1300;
       const remaining = Math.max(0, target - consumed);
 
       document.getElementById('gauge-consumed').innerText = consumed;
@@ -828,71 +827,87 @@
       drawWeightChart(weightsArr);
     }
 
-    /* TRACÉ COMPLÈTEMENT DYNAMIQUE DU GRAPHIQUE AVEC DATES */
+    /* TRACÉ AVEC AXES STRUCTURÉS : 55KG À 85KG EN ORDONNÉES, DATES EN ABSCISSES */
     function drawWeightChart(dataArr) {
       const canvas = document.getElementById('weight-chart');
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const minW = 55;
+      const maxW = 85;
+      const paddingLeft = 45;
+      const paddingRight = 20;
+      const paddingTop = 20;
+      const paddingBottom = 30;
+
+      const width = canvas.width - paddingLeft - paddingRight;
+      const height = canvas.height - paddingTop - paddingBottom;
+
+      // Dessiner l'axe des ordonnées (De 55kg à 85kg avec paliers de 10kg)
+      ctx.textAlign = "right";
+      ctx.font = "bold 11px Quicksand";
+      ctx.fillStyle = "#888";
+      ctx.strokeStyle = "#ffe3ed";
+      ctx.lineWidth = 1;
+
+      const steps = [55, 65, 75, 85];
+      steps.forEach(w => {
+        const y = canvas.height - paddingBottom - (((w - minW) / (maxW - minW)) * height);
+        ctx.fillText(`${w} kg`, paddingLeft - 8, y + 4);
+        
+        ctx.beginPath();
+        ctx.moveTo(paddingLeft, y);
+        ctx.lineTo(canvas.width - paddingRight, y);
+        ctx.stroke();
+      });
+
       if (dataArr.length === 0) {
         ctx.fillStyle = "#aaa";
         ctx.font = "14px Quicksand";
-        ctx.fillText("Aucune donnée de poids pour le moment", 130, 125);
+        ctx.textAlign = "center";
+        ctx.fillText("Aucune donnée de poids pour le moment", canvas.width / 2, canvas.height / 2);
         return;
       }
 
-      // Trier du plus ancien au plus récent
       const sorted = [...dataArr].sort((a,b) => a.date.localeCompare(b.date));
-      
-      const padding = 40;
-      const width = canvas.width - (padding * 2);
-      const height = canvas.height - (padding * 2);
-
-      const weights = sorted.map(d => parseFloat(d.weight));
-      let minW = Math.min(...weights) - 1;
-      let maxW = Math.max(...weights) + 1;
-      if (minW === maxW) { minW -= 1; maxW += 1; }
-
       const stepX = sorted.length > 1 ? width / (sorted.length - 1) : width / 2;
 
-      // Dessiner la ligne de tendance
+      // Tracé de la ligne rose
       ctx.beginPath();
       ctx.strokeStyle = "#ff007f";
       ctx.lineWidth = 3;
 
       sorted.forEach((d, i) => {
-        const x = sorted.length === 1 ? canvas.width / 2 : padding + (i * stepX);
-        const y = canvas.height - padding - (((parseFloat(d.weight) - minW) / (maxW - minW)) * height);
+        const wVal = Math.min(Math.max(parseFloat(d.weight), minW), maxW);
+        const x = sorted.length === 1 ? paddingLeft + (width / 2) : paddingLeft + (i * stepX);
+        const y = canvas.height - paddingBottom - (((wVal - minW) / (maxW - minW)) * height);
+        
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       });
       ctx.stroke();
 
-      // Dessiner les points, la valeur et la date
+      // Points et dates en abscisse
       sorted.forEach((d, i) => {
-        const x = sorted.length === 1 ? canvas.width / 2 : padding + (i * stepX);
-        const y = canvas.height - padding - (((parseFloat(d.weight) - minW) / (maxW - minW)) * height);
+        const wVal = Math.min(Math.max(parseFloat(d.weight), minW), maxW);
+        const x = sorted.length === 1 ? paddingLeft + (width / 2) : paddingLeft + (i * stepX);
+        const y = canvas.height - paddingBottom - (((wVal - minW) / (maxW - minW)) * height);
 
-        // Point
+        // Point uniquement (sans texte au-dessus)
         ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
         ctx.fillStyle = "#c71585";
         ctx.fill();
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Afficher le Poids (au-dessus du point)
-        ctx.fillStyle = "#4a0033";
-        ctx.font = "bold 11px Quicksand";
-        ctx.textAlign = "center";
-        ctx.fillText(`${d.weight} kg`, x, y - 10);
-
-        // Afficher la Date (en-dessous du graphique)
+        // Date en abscisses (format jj/mm)
         const dObj = new Date(d.date);
         const dateStr = `${dObj.getDate()}/${dObj.getMonth() + 1}`;
         ctx.fillStyle = "#666";
-        ctx.font = "10px Quicksand";
+        ctx.font = "bold 10px Quicksand";
+        ctx.textAlign = "center";
         ctx.fillText(dateStr, x, canvas.height - 10);
       });
     }
