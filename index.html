@@ -4,70 +4,77 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Carnet Minceur</title>
+  <!-- Police Poppins pour un style doux et girly -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
     :root {
-      --primary: #e8637a;
-      --primary-light: #fdf2f4;
-      --secondary: #4a5568;
-      --bg: #fff5f7;
-      --card-bg: #ffffff;
-      --text: #2d3748;
-      --accent-blue: #3182ce;
-      --accent-green: #38a169;
+      --primary: #fd79a8;
+      --primary-dark: #e84393;
+      --primary-light: #fde8f0;
+      --bg-pink: #fbebf2;
+      --card-bg: #fff0f5;
+      --card-border: #f8c2d8;
+      --text-color: #4a2e35;
+      --accent-blue: #74b9ff;
+      --accent-green: #55efc4;
     }
 
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); margin: 0; padding-bottom: 110px; color: var(--text); font-size: 16px; }
+    * { box-sizing: border-box; font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background-color: var(--bg-pink); margin: 0; padding-bottom: 120px; color: var(--text-color); font-size: 15px; }
     
-    header { background: white; padding: 15px; text-align: center; border-bottom: 2px solid #f0d8df; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    header h1 { margin: 0; font-size: 22px; color: var(--primary); font-weight: bold; }
-    .date-nav { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 10px; font-weight: bold; font-size: 18px; }
-    .date-nav button { background: var(--primary-light); border: 1px solid var(--primary); border-radius: 8px; font-size: 20px; color: var(--primary); cursor: pointer; padding: 6px 14px; }
-    .week-badge { background: var(--primary); color: white; padding: 5px 12px; border-radius: 15px; font-size: 14px; margin-top: 6px; display: inline-block; font-weight: bold; }
+    header { background: #ffffff; padding: 18px 15px; text-align: center; border-bottom: 3px solid var(--card-border); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 15px rgba(232, 67, 147, 0.1); }
+    header h1 { margin: 0; font-size: 24px; color: var(--primary-dark); font-weight: 700; letter-spacing: 0.5px; }
+    .date-nav { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 10px; font-weight: 600; font-size: 18px; }
+    .date-nav button { background: var(--primary-light); border: 2px solid var(--primary); border-radius: 50%; font-size: 18px; color: var(--primary-dark); cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    .week-badge { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 6px 16px; border-radius: 20px; font-size: 13px; margin-top: 8px; display: inline-block; font-weight: 600; box-shadow: 0 2px 8px rgba(232, 67, 147, 0.25); }
 
     .container { padding: 15px; max-width: 650px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    .card { background: var(--card-bg); border-radius: 15px; padding: 18px; margin-bottom: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #f7e6eb; }
-    .card-title { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary); margin-bottom: 12px; font-size: 18px; border-bottom: 2px dashed #f0d8df; padding-bottom: 8px; }
+    /* CARTES ROSES DOUCES */
+    .card { background: var(--card-bg); border-radius: 18px; padding: 18px; margin-bottom: 18px; box-shadow: 0 4px 15px rgba(232, 67, 147, 0.08); border: 2px solid var(--card-border); }
+    .card-title { display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: var(--primary-dark); margin-bottom: 14px; font-size: 17px; background: var(--primary-light); padding: 8px 14px; border-radius: 12px; }
 
     .input-group { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-    input, select { padding: 12px 14px; border: 1.5px solid #cbd5e0; border-radius: 10px; font-size: 16px; outline: none; }
-    input:focus { border-color: var(--primary); }
+    input, select { padding: 12px 14px; border: 2px solid var(--card-border); border-radius: 12px; font-size: 15px; outline: none; background: #ffffff; color: var(--text-color); }
+    input:focus, select:focus { border-color: var(--primary-dark); }
     .input-flex { flex: 1; min-width: 120px; }
-    .input-small { width: 90px; }
-    button.btn-add { background: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
+    .input-small { width: 95px; }
+    button.btn-add { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; box-shadow: 0 3px 10px rgba(232, 67, 147, 0.2); }
 
     .item-list { list-style: none; padding: 0; margin: 0; }
-    .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #edf2f7; font-size: 16px; }
+    .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 8px; border-bottom: 1px solid var(--card-border); font-size: 15px; }
     .item-row:last-child { border-bottom: none; }
     .item-actions { display: flex; align-items: center; gap: 10px; }
-    .qty-edit { background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 6px; padding: 4px 8px; font-weight: bold; cursor: pointer; color: var(--secondary); font-size: 15px; }
-    .btn-delete { color: #e53e3e; background: none; border: none; cursor: pointer; font-size: 20px; padding: 0 6px; }
+    .qty-edit { background: #ffffff; border: 1.5px solid var(--primary); border-radius: 8px; padding: 4px 10px; font-weight: 600; cursor: pointer; color: var(--primary-dark); font-size: 14px; }
+    .btn-delete { color: #ff7675; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 6px; font-weight: bold; }
 
-    /* BARRE DE NAVIGATION AGRANDIE */
-    nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0 16px 0; border-top: 2px solid #f0d8df; box-shadow: 0 -4px 12px rgba(0,0,0,0.08); z-index: 1000; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #718096; font-size: 13px; font-weight: bold; cursor: pointer; gap: 4px; flex: 1; }
-    .nav-item.active { color: var(--primary); }
-    .nav-item svg { width: 28px; height: 28px; fill: currentColor; }
+    /* BARRE DE NAVIGATION ROSE */
+    nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #ffffff; display: flex; justify-content: space-around; padding: 10px 0 14px 0; border-top: 3px solid var(--card-border); box-shadow: 0 -4px 20px rgba(232, 67, 147, 0.12); z-index: 1000; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #b2bec3; font-size: 12px; font-weight: 600; cursor: pointer; gap: 4px; flex: 1; }
+    .nav-item.active { color: var(--primary-dark); }
+    .nav-item svg { width: 26px; height: 26px; fill: currentColor; }
 
-    .recap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
-    .recap-table th, .recap-table td { border: 1px solid #cbd5e0; padding: 8px 4px; text-align: center; }
-    .recap-table th { background-color: var(--primary-light); color: var(--primary); font-size: 14px; }
-    .recap-total { font-weight: bold; background-color: #f7fafc; }
+    .recap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; background: #ffffff; border-radius: 10px; overflow: hidden; }
+    .recap-table th, .recap-table td { border: 1px solid var(--card-border); padding: 8px 4px; text-align: center; }
+    .recap-table th { background-color: var(--primary-light); color: var(--primary-dark); font-size: 13px; font-weight: 700; }
+    .recap-total { font-weight: 700; background-color: var(--primary-light); color: var(--primary-dark); }
 
-    .chart-container { width: 100%; height: 220px; margin: 15px 0; }
+    .chart-container { width: 100%; height: 220px; margin: 10px 0; }
 
-    .backup-box { margin-top: 25px; padding: 18px; border: 2px solid #e2e8f0; border-radius: 15px; background: white; text-align: center; }
-    .btn-export { background: var(--accent-green); color: white; padding: 12px 18px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; }
-    .btn-import { background: var(--accent-blue); color: white; padding: 12px 18px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; display: inline-block; margin-top: 8px; }
+    .backup-box { margin-top: 25px; padding: 20px; border: 2px dashed var(--primary); border-radius: 18px; background: #ffffff; text-align: center; }
+    .btn-export { background: #00b894; color: white; padding: 12px 18px; border: none; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .btn-import { background: #0984e3; color: white; padding: 12px 18px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; display: inline-block; margin-top: 8px; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Mon Carnet Minceur</h1>
+    <h1>Mon Carnet Minceur 🌸</h1>
     <div class="date-nav">
       <button onclick="changeDate(-1)">❮</button>
       <span id="current-date-display">...</span>
@@ -109,15 +116,15 @@
       <div class="card">
         <div class="card-title">🚶‍♀️ Saisie de la Marche du Jour</div>
         <div class="input-group">
-          <label style="width:100%; font-weight:bold; font-size:14px; margin-bottom:4px;">Nombre de pas :</label>
+          <label style="width:100%; font-weight:600; font-size:13px; margin-bottom:2px;">Nombre de pas :</label>
           <input type="number" id="activity-steps" class="input-flex" placeholder="ex: 8500 pas">
         </div>
         <div class="input-group">
-          <label style="width:100%; font-weight:bold; font-size:14px; margin-bottom:4px;">Distance (km) :</label>
+          <label style="width:100%; font-weight:600; font-size:13px; margin-bottom:2px;">Distance (km) :</label>
           <input type="number" step="0.1" id="activity-km" class="input-flex" placeholder="ex: 5.2 km">
         </div>
         <div class="input-group">
-          <label style="width:100%; font-weight:bold; font-size:14px; margin-bottom:4px;">Calories brûlées (kcal) :</label>
+          <label style="width:100%; font-weight:600; font-size:13px; margin-bottom:2px;">Calories brûlées (kcal) :</label>
           <input type="number" id="activity-kcal" class="input-flex" placeholder="ex: 320 kcal">
         </div>
         <button class="btn-add" style="width:100%; margin-top:8px;" onclick="addActivity()">Enregistrer la Marche</button>
@@ -151,7 +158,7 @@
       <div class="card">
         <div class="card-title">📊 Récapitulatif Calories</div>
         <div class="input-group">
-          <label style="align-self:center; font-weight:bold; font-size:15px;">Semaine :</label>
+          <label style="align-self:center; font-weight:600; font-size:14px;">Semaine :</label>
           <select id="recap-week-select" onchange="renderRecapTable()" class="input-flex"></select>
         </div>
         <div id="recap-table-container"></div>
@@ -160,7 +167,7 @@
 
     <!-- SAUVEGARDE ET RESTAURATION -->
     <div class="backup-box">
-      <h3 style="margin-top:0; font-size:16px;">Restaurer / Sauvegarder</h3>
+      <h3 style="margin-top:0; font-size:15px; color: var(--primary-dark);">Restaurer / Sauvegarder</h3>
       <label class="btn-import">
         📂 CHARGER VOTRE FICHIER JSON
         <input type="file" id="importFile" onchange="importerDonnees(event)" style="display: none;" accept=".json,.txt">
@@ -171,7 +178,6 @@
 
   </div>
 
-  <!-- BARRE DU BAS PLUS GRANDE -->
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="switchTab('repas', event)">
       <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.46 3.9 3.45 4.35L4 22h2.1l1.9-8h2l1.9 8H14l-2.45-8.65C13.54 12.9 15 11.12 15 9V2h-2v7h-2zm9-7h-3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h1v8h2V4c0-1.1-.9-2-2-2z"/></svg>
@@ -246,7 +252,6 @@
     function getMealData(dateKey) {
       let result = { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
 
-      // Recherche prioritaire dans la structure détectée : minceur_dailyMeals
       let dailyMeals = safeParse(localStorage.getItem('minceur_dailyMeals')) || safeParse(localStorage.getItem('dailyMeals')) || {};
       dailyMeals = safeParse(dailyMeals);
 
@@ -259,7 +264,6 @@
         return result;
       }
 
-      // Fallback si ancienne clé individuelle
       let individual = safeParse(localStorage.getItem(`meals_${dateKey}`));
       if (individual && typeof individual === 'object') return individual;
 
@@ -413,7 +417,7 @@
     function renderWeightChart(dataArr) {
       const container = document.getElementById('weight-chart');
       if (!dataArr || dataArr.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#999; padding-top:80px;">Aucune donnée de poids enregistrée.</p>';
+        container.innerHTML = '<p style="text-align:center; color:#b2bec3; padding-top:80px;">Aucune donnée de poids enregistrée.</p>';
         return;
       }
 
@@ -433,13 +437,13 @@
         const x = getX(i);
         const y = getY(d.weight);
         pointsPath += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
-        dotsSvg += `<circle cx="${x}" cy="${y}" r="5" fill="#e8637a" />`;
-        dotsSvg += `<text x="${x}" y="${y - 10}" font-size="12" text-anchor="middle" fill="#2d3748" font-weight="bold">${d.weight}</text>`;
+        dotsSvg += `<circle cx="${x}" cy="${y}" r="6" fill="#e84393" />`;
+        dotsSvg += `<text x="${x}" y="${y - 10}" font-size="12" text-anchor="middle" fill="#4a2e35" font-weight="bold">${d.weight}</text>`;
       });
 
       container.innerHTML = `
         <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%;">
-          <path d="${pointsPath}" fill="none" stroke="#e8637a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="${pointsPath}" fill="none" stroke="#fd79a8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
           ${dotsSvg}
         </svg>
       `;
@@ -494,7 +498,7 @@
         li.innerHTML = `
           <div>
             <strong>${act.date}</strong> (Sem. ${getWeekNumber(new Date(act.date))})<br>
-            <span style="font-size:14px; color:var(--secondary);">🚶 ${act.steps || 0} pas | ${act.km || 0} km | ${act.kcal || 0} kcal</span>
+            <span style="font-size:13px; color:#b2bec3;">🚶 ${act.steps || 0} pas | ${act.km || 0} km | ${act.kcal || 0} kcal</span>
           </div>
           <button class="btn-delete" onclick="deleteActivity(${act.id})">✕</button>
         `;
@@ -620,7 +624,7 @@
       html += `
           </tbody>
           <tfoot>
-            <tr class="recap-total" style="background-color: var(--primary-light); color: var(--primary);">
+            <tr class="recap-total">
               <td colspan="5">TOTAL SEMAINE ${targetWeek}</td>
               <td>${totalSemaine} kcal</td>
             </tr>
