@@ -64,6 +64,9 @@
     .recap-table th { background-color: var(--primary-light); color: var(--primary); }
     .recap-total { font-weight: bold; background-color: #f7fafc; }
 
+    /* Chart Container */
+    .chart-container { width: 100%; height: 220px; margin: 15px 0; }
+
     /* Backup Box */
     .backup-box { margin-top: 25px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; background: white; text-align: center; }
     .btn-export { background: var(--accent-green); color: white; padding: 8px 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
@@ -89,7 +92,7 @@
       <div id="meals-container"></div>
     </div>
 
-    <!-- ONGLET 2 : POIDS -->
+    <!-- ONGLET 2 : POIDS ET COURBE -->
     <div id="tab-poids" class="tab-content">
       <div class="card">
         <div class="card-title">⚖️ Saisie du Poids du Jour</div>
@@ -98,6 +101,12 @@
           <button class="btn-add" onclick="saveWeight()">Enregistrer</button>
         </div>
       </div>
+
+      <div class="card">
+        <div class="card-title">📉 Courbe d'Évolution de Poids</div>
+        <div class="chart-container" id="weight-chart"></div>
+      </div>
+
       <div class="card">
         <div class="card-title">📈 Historique des pesées</div>
         <ul id="weight-history" class="item-list"></ul>
@@ -148,6 +157,7 @@
           <label style="align-self:center; font-weight:bold; font-size:13px;">Semaine :</label>
           <select id="recap-week-select" onchange="renderRecapTable()" class="input-flex"></select>
         </div>
+        <p style="font-size:11px; color:#718096; margin-top:-5px; margin-bottom:10px;">Note : Le récapitulatif se calcule automatiquement d'après les repas renseignés dans l'onglet <strong>Repas</strong>.</p>
         <div id="recap-table-container"></div>
       </div>
     </div>
@@ -155,7 +165,7 @@
     <!-- SAUVEGARDE ET RESTAURATION -->
     <div class="backup-box">
       <h3 style="margin-top:0; font-size:15px; color:var(--text);">Sauvegarde de vos données</h3>
-      <p style="font-size:12px; color:#666; margin-bottom:12px;">Téléchargez une sauvegarde avant d'effacer Safari.</p>
+      <p style="font-size:12px; color:#666; margin-bottom:12px;">Téléchargez une sauvegarde régulière pour sécuriser vos données.</p>
       <button class="btn-export" onclick="exporterDonnees()">💾 Exporter mes données</button>
       <span style="display:inline-block; width:8px;"></span>
       <label class="btn-import">
@@ -191,7 +201,7 @@
   </nav>
 
   <script>
-    const REF_DATE = new Date(2026, 6, 27);
+    const REF_DATE = new Date(2026, 3, 20); // Alignement sur le premier relevé de pesée (20 avril 2026)
     const REF_WEEK = 15;
 
     let currentDate = new Date();
@@ -241,8 +251,8 @@
     function getFoodDB() {
       const stored = parseStorageJson('minceur_foodDb') || parseStorageJson('food_db') || parseStorageJson('aliments');
       return stored || [
-        { name: "Pomme", kcal: 52 },
-        { name: "Poulet (blanc)", kcal: 120 }
+        { name: "Activia vanille", kcal: 92 },
+        { name: "Aiguillettes de poulet", kcal: 118 }
       ];
     }
 
@@ -429,28 +439,88 @@
       renderMealsView(dateKey);
     }
 
+    /* --- RENDU POIDS & GRAPHIQUE SVG --- */
     function renderWeightView(dateKey) {
       let rawWeights = parseStorageJson('minceur_weightLog') || parseStorageJson('weight_history') || parseStorageJson('poids') || [];
-      let weightsObj = {};
+      let weightsArr = [];
 
       if (Array.isArray(rawWeights)) {
-        rawWeights.forEach(item => { if (item.date && item.weight) weightsObj[item.date] = item.weight; });
-      } else {
-        weightsObj = rawWeights;
+        weightsArr = rawWeights.filter(w => w.date && w.weight);
+      } else if (typeof rawWeights === 'object') {
+        Object.keys(rawWeights).forEach(k => {
+          weightsArr.push({ date: k, weight: parseFloat(rawWeights[k]) });
+        });
       }
 
-      document.getElementById('weight-input').value = weightsObj[dateKey] || '';
+      const todayObj = weightsArr.find(w => w.date === dateKey);
+      document.getElementById('weight-input').value = todayObj ? todayObj.weight : '';
 
+      // Historique
       const historyUl = document.getElementById('weight-history');
       historyUl.innerHTML = '';
-      const sortedKeys = Object.keys(weightsObj).sort().reverse();
       
-      sortedKeys.forEach(k => {
+      weightsArr.sort((a,b) => b.date.localeCompare(a.date));
+      weightsArr.forEach(w => {
         const li = document.createElement('li');
         li.className = 'item-row';
-        li.innerHTML = `<span>${k} (Sem. ${getWeekNumber(new Date(k))})</span><strong>${weightsObj[k]} kg</strong>`;
+        li.innerHTML = `<span>${w.date} (Sem. ${getWeekNumber(new Date(w.date))})</span><strong>${w.weight} kg</strong>`;
         historyUl.appendChild(li);
       });
+
+      // Rendu Graphique
+      renderWeightChart(weightsArr);
+    }
+
+    function renderWeightChart(dataArr) {
+      const container = document.getElementById('weight-chart');
+      if (!dataArr || dataArr.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#999; padding-top:80px;">Aucune donnée de poids enregistrée.</p>';
+        return;
+      }
+
+      // Trier par date croissante pour le tracé
+      const sorted = [...dataArr].sort((a,b) => a.date.localeCompare(b.date));
+      const weights = sorted.map(d => parseFloat(d.weight));
+      
+      const minW = Math.floor(Math.min(...weights) - 1);
+      const maxW = Math.ceil(Math.max(...weights) + 1);
+      
+      const width = 500;
+      const height = 200;
+      const padding = 35;
+
+      const getX = (i) => padding + (i / (sorted.length - 1 || 1)) * (width - 2 * padding);
+      const getY = (w) => height - padding - ((w - minW) / (maxW - minW || 1)) * (height - 2 * padding);
+
+      let pointsPath = "";
+      let dotsSvg = "";
+
+      sorted.forEach((d, i) => {
+        const x = getX(i);
+        const y = getY(parseFloat(d.weight));
+        if (i === 0) {
+          pointsPath += `M ${x} ${y}`;
+        } else {
+          pointsPath += ` L ${x} ${y}`;
+        }
+        dotsSvg += `<circle cx="${x}" cy="${y}" r="4" fill="#e8637a" />`;
+        dotsSvg += `<text x="${x}" y="${y - 8}" font-size="10" text-anchor="middle" fill="#4a5568" font-weight="bold">${d.weight}</text>`;
+      });
+
+      let gridSvg = "";
+      for (let w = minW; w <= maxW; w += 2) {
+        const y = getY(w);
+        gridSvg += `<line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="#edf2f7" stroke-dasharray="3,3" />`;
+        gridSvg += `<text x="${padding - 5}" y="${y + 3}" font-size="10" text-anchor="end" fill="#a0aec0">${w}</text>`;
+      }
+
+      container.innerHTML = `
+        <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%;">
+          ${gridSvg}
+          <path d="${pointsPath}" fill="none" stroke="#e8637a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          ${dotsSvg}
+        </svg>
+      `;
     }
 
     function saveWeight() {
@@ -569,7 +639,7 @@
       const selectedVal = select.value;
       
       select.innerHTML = '';
-      for (let w = 15; w <= Math.max(currentW + 2, 20); w++) {
+      for (let w = 15; w <= Math.max(currentW + 2, 25); w++) {
         const opt = document.createElement('option');
         opt.value = w;
         opt.innerText = `Semaine ${w}`;
