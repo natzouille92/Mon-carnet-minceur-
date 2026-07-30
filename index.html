@@ -11,12 +11,13 @@
   
   <style>
     :root {
-      --primary-pink: #ff75a0;
-      --primary-dark: #d6336c;
+      --primary-pink: #ff1493; /* Rose Fuchsia Vif */
+      --primary-dark: #c71585; /* Fuchsia Sombre */
+      --fuchsia-bright: #ff007f;
       --soft-pink: #fff0f5;
       --card-bg: linear-gradient(145deg, #ffffff, #ffe3ed);
-      --card-border: #fcc2d7;
-      --text-color: #5c223a;
+      --card-border: #ffb6c1;
+      --text-color: #4a0033;
       --bg-page: #fde8ef;
     }
 
@@ -33,41 +34,42 @@
       font-size: 15px; 
     }
     
-    /* BANDEAU DE BIENVENUE GIRLY ET FLORAL */
+    /* EN-TÊTE FIXE AVEC BANDEAU FUCHSIA */
     header { 
-      background: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%); 
-      padding: 18px 15px 15px 15px; 
+      background: linear-gradient(180deg, #ffffff 0%, #ffe6f0 100%); 
+      padding: 15px 12px; 
       text-align: center; 
-      border-bottom: 3px dashed #ff9ebb; 
+      border-bottom: 3px solid var(--fuchsia-bright); 
       position: sticky; 
       top: 0; 
       z-index: 100; 
-      box-shadow: 0 6px 20px rgba(255, 117, 160, 0.2); 
+      box-shadow: 0 6px 20px rgba(255, 20, 147, 0.25); 
       border-radius: 0 0 25px 25px;
     }
     
+    /* ENCADRÉ FUCHSIA POUR LE SALUT ET LA MAXIME */
     .welcome-banner {
       background: #ffffff;
-      border: 2px dashed #ff75a0;
+      border: 3px solid var(--fuchsia-bright);
       border-radius: 20px;
-      padding: 12px 18px;
+      padding: 12px 15px;
       margin-bottom: 12px;
-      box-shadow: 0 4px 12px rgba(255, 117, 160, 0.15);
-      position: relative;
+      box-shadow: 0 4px 15px rgba(255, 0, 127, 0.2);
     }
 
     .welcome-title {
-      font-size: 20px;
-      color: var(--primary-dark);
+      font-size: 22px;
+      color: var(--fuchsia-bright);
       font-weight: 700;
       margin: 0 0 4px 0;
+      text-shadow: 1px 1px 2px rgba(255, 20, 147, 0.15);
     }
 
     .welcome-quote {
-      font-size: 13px;
-      color: #a06a7b;
+      font-size: 14px;
+      color: var(--primary-dark);
       font-style: italic;
-      font-weight: 600;
+      font-weight: 700;
       margin: 0;
     }
     
@@ -84,10 +86,10 @@
     
     .date-nav button { 
       background: #ffe3ed; 
-      border: 2px solid var(--primary-pink); 
+      border: 2px solid var(--fuchsia-bright); 
       border-radius: 50%; 
       font-size: 16px; 
-      color: var(--primary-dark); 
+      color: var(--fuchsia-bright); 
       cursor: pointer; 
       width: 36px; 
       height: 36px; 
@@ -95,19 +97,19 @@
       align-items: center; 
       justify-content: center; 
       font-weight: bold;
-      box-shadow: 0 2px 6px rgba(214, 51, 108, 0.15);
+      box-shadow: 0 2px 6px rgba(255, 0, 127, 0.2);
     }
 
     .week-badge { 
-      background: linear-gradient(135deg, #ff75a0, #d6336c); 
+      background: linear-gradient(135deg, #ff007f, #c71585); 
       color: white; 
-      padding: 5px 18px; 
+      padding: 6px 20px; 
       border-radius: 20px; 
-      font-size: 13px; 
+      font-size: 14px; 
       margin-top: 8px; 
       display: inline-block; 
       font-weight: 700; 
-      box-shadow: 0 3px 10px rgba(214, 51, 108, 0.25); 
+      box-shadow: 0 3px 10px rgba(199, 21, 133, 0.3); 
     }
 
     .container { padding: 15px; max-width: 650px; margin: 0 auto; }
@@ -120,7 +122,7 @@
       border-radius: 22px; 
       padding: 18px; 
       margin-bottom: 20px; 
-      box-shadow: 0 6px 18px rgba(255, 117, 160, 0.12); 
+      box-shadow: 0 6px 18px rgba(255, 20, 147, 0.12); 
       border: 2px solid var(--card-border); 
     }
     
@@ -135,7 +137,7 @@
       background: #ffe8f0; 
       padding: 10px 16px; 
       border-radius: 16px; 
-      border-left: 5px solid var(--primary-pink);
+      border-left: 5px solid var(--fuchsia-bright);
     }
 
     .input-group { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
@@ -150,13 +152,13 @@
       color: var(--text-color); 
       font-weight: 600;
     }
-    input:focus, select:focus { border-color: var(--primary-dark); background: #ffffff; }
+    input:focus, select:focus { border-color: var(--fuchsia-bright); background: #ffffff; }
     
     .input-flex { flex: 1; min-width: 120px; }
     .input-small { width: 95px; }
     
     button.btn-add { 
-      background: linear-gradient(135deg, #ff75a0, #d6336c); 
+      background: linear-gradient(135deg, #ff007f, #c71585); 
       color: white; 
       border: none; 
       padding: 12px 22px; 
@@ -164,7 +166,7 @@
       font-weight: 700; 
       font-size: 16px; 
       cursor: pointer; 
-      box-shadow: 0 4px 12px rgba(214, 51, 108, 0.25); 
+      box-shadow: 0 4px 12px rgba(199, 21, 133, 0.3); 
     }
 
     .item-list { list-style: none; padding: 0; margin: 0; }
@@ -173,7 +175,7 @@
       justify-content: space-between; 
       align-items: center; 
       padding: 12px 8px; 
-      border-bottom: 1px solid #fcc2d7; 
+      border-bottom: 1px solid #ffb6c1; 
       font-size: 15px; 
     }
     .item-row:last-child { border-bottom: none; }
@@ -181,7 +183,7 @@
     
     .qty-edit { 
       background: #ffe3ed; 
-      border: 1.5px solid var(--primary-pink); 
+      border: 1.5px solid var(--fuchsia-bright); 
       border-radius: 10px; 
       padding: 5px 12px; 
       font-weight: 700; 
@@ -189,7 +191,7 @@
       color: var(--primary-dark); 
       font-size: 14px; 
     }
-    .btn-delete { color: #ff5252; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 6px; font-weight: bold; }
+    .btn-delete { color: #ff0055; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 6px; font-weight: bold; }
 
     /* NAVIGATION BASSE */
     nav.bottom-nav { 
@@ -202,7 +204,7 @@
       justify-content: space-around; 
       padding: 12px 0 16px 0; 
       border-top: 3px solid var(--card-border); 
-      box-shadow: 0 -4px 20px rgba(255, 117, 160, 0.15); 
+      box-shadow: 0 -4px 20px rgba(255, 20, 147, 0.15); 
       z-index: 1000; 
       border-radius: 20px 20px 0 0;
     }
@@ -219,7 +221,7 @@
       gap: 4px; 
       flex: 1; 
     }
-    .nav-item.active { color: var(--primary-dark); }
+    .nav-item.active { color: var(--fuchsia-bright); }
     .nav-item svg { width: 28px; height: 28px; fill: currentColor; }
 
     .recap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; background: #ffffff; border-radius: 14px; overflow: hidden; }
@@ -232,7 +234,7 @@
     .backup-box { 
       margin-top: 25px; 
       padding: 20px; 
-      border: 2px dashed var(--primary-pink); 
+      border: 2px dashed var(--fuchsia-bright); 
       border-radius: 20px; 
       background: #fff5f8; 
       text-align: center; 
@@ -244,7 +246,7 @@
 <body>
 
   <header>
-    <!-- BANDEAU ACCUEIL FLORAL / GIRLY -->
+    <!-- BANDEAU ACCUEIL ROSE FUCHSIA -->
     <div class="welcome-banner">
       <h1 class="welcome-title">🌸 Bonjour Nathalie 👋 🌸</h1>
       <p class="welcome-quote">✨ « Manger mieux pour vivre mieux » ✨</p>
@@ -387,7 +389,6 @@
       const date = new Date(d);
       date.setHours(0,0,0,0);
       const day = date.getDay();
-      // On se recale au lundi précédant ou égal
       const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
       const monday = new Date(date.setDate(diffToMonday));
       
@@ -616,13 +617,13 @@
         const x = getX(i);
         const y = getY(d.weight);
         pointsPath += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
-        dotsSvg += `<circle cx="${x}" cy="${y}" r="6" fill="#d6336c" />`;
+        dotsSvg += `<circle cx="${x}" cy="${y}" r="6" fill="#ff007f" />`;
         dotsSvg += `<text x="${x}" y="${y - 10}" font-size="12" text-anchor="middle" fill="#5c223a" font-weight="bold">${d.weight}</text>`;
       });
 
       container.innerHTML = `
         <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%;">
-          <path d="${pointsPath}" fill="none" stroke="#ff75a0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="${pointsPath}" fill="none" stroke="#ff007f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
           ${dotsSvg}
         </svg>
       `;
@@ -677,7 +678,7 @@
         li.innerHTML = `
           <div>
             <strong>${act.date}</strong> (Sem. ${getWeekNumber(new Date(act.date))})<br>
-            <span style="font-size:13px; color:#a06a7b;">🚶 ${act.steps || 0} pas | ${act.km || 0} km | ${act.kcal || 0} kcal</span>
+            <span style="font-size:13px; color:#c71585;">🚶 ${act.steps || 0} pas | ${act.km || 0} km | ${act.kcal || 0} kcal</span>
           </div>
           <button class="btn-delete" onclick="deleteActivity(${act.id})">✕</button>
         `;
