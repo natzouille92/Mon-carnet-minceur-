@@ -43,33 +43,78 @@
       border-radius: 0 0 25px 25px;
     }
     
-    /* TOUT PREMIER BLOC VISIBLE DANS L'ENTÊTE */
     .welcome-banner {
       background: #ffffff !important;
       border: 3px solid #ff007f !important;
       border-radius: 20px;
-      padding: 15px !important;
-      margin-bottom: 12px;
+      padding: 12px !important;
+      margin-bottom: 10px;
       box-shadow: 0 4px 15px rgba(255, 0, 127, 0.25);
-      display: block !important;
-      visibility: visible !important;
     }
 
     .welcome-title {
-      font-size: 22px !important;
+      font-size: 20px !important;
       color: #ff007f !important;
       font-weight: 700 !important;
-      margin: 0 0 6px 0 !important;
-      display: block !important;
+      margin: 0 0 4px 0 !important;
     }
 
     .welcome-quote {
-      font-size: 15px !important;
+      font-size: 14px !important;
       color: #c71585 !important;
       font-style: italic !important;
       font-weight: 700 !important;
       margin: 0 !important;
-      display: block !important;
+    }
+
+    /* GAUGE STYLES */
+    .calorie-gauge-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin: 10px 0;
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 20px;
+      border: 2px solid var(--card-border);
+    }
+
+    .gauge-svg {
+      width: 90px;
+      height: 90px;
+      transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: #ffe3ed;
+      stroke-width: 8;
+    }
+
+    .gauge-progress {
+      fill: none;
+      stroke: var(--fuchsia-bright);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 251.2;
+      stroke-dashoffset: 251.2;
+      transition: stroke-dashoffset 0.5s ease;
+    }
+
+    .gauge-info {
+      text-align: left;
+    }
+
+    .gauge-info div {
+      margin: 2px 0;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .gauge-info span {
+      font-weight: 700;
+      color: var(--fuchsia-bright);
     }
     
     .date-nav { 
@@ -79,7 +124,7 @@
       gap: 15px; 
       margin-top: 8px; 
       font-weight: 700; 
-      font-size: 17px; 
+      font-size: 16px; 
       color: var(--primary-dark);
     }
     
@@ -90,21 +135,20 @@
       font-size: 16px; 
       color: var(--fuchsia-bright); 
       cursor: pointer; 
-      width: 36px; 
-      height: 36px; 
+      width: 34px; 
+      height: 34px; 
       display: flex; 
       align-items: center; 
       justify-content: center; 
-      font-weight: bold;
     }
 
     .week-badge { 
       background: linear-gradient(135deg, #ff007f, #c71585); 
       color: white; 
-      padding: 6px 20px; 
+      padding: 4px 16px; 
       border-radius: 20px; 
-      font-size: 14px; 
-      margin-top: 8px; 
+      font-size: 13px; 
+      margin-top: 6px; 
       display: inline-block; 
       font-weight: 700; 
     }
@@ -136,13 +180,13 @@
       border-left: 5px solid var(--fuchsia-bright);
     }
 
-    .input-group { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .input-group { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; position: relative; }
     
     input, select { 
-      padding: 12px 14px; 
+      padding: 10px 12px; 
       border: 2px solid var(--card-border); 
       border-radius: 14px; 
-      font-size: 15px; 
+      font-size: 14px; 
       outline: none; 
       background: #fff9fc; 
       color: var(--text-color); 
@@ -150,17 +194,45 @@
     }
     
     .input-flex { flex: 1; min-width: 120px; }
-    .input-small { width: 95px; }
+    .input-small { width: 85px; }
     
     button.btn-add { 
       background: linear-gradient(135deg, #ff007f, #c71585); 
       color: white; 
       border: none; 
-      padding: 12px 22px; 
+      padding: 10px 18px; 
       border-radius: 14px; 
       font-weight: 700; 
       font-size: 16px; 
       cursor: pointer; 
+    }
+
+    /* AUTOCOMPLETE DROPDOWN */
+    .autocomplete-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 95px;
+      background: white;
+      border: 2px solid var(--fuchsia-bright);
+      border-radius: 12px;
+      max-height: 150px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: none;
+    }
+
+    .autocomplete-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #ffe3ed;
+      font-size: 14px;
+    }
+
+    .autocomplete-item:hover {
+      background: #ffe3ed;
+      color: var(--fuchsia-bright);
     }
 
     .item-list { list-style: none; padding: 0; margin: 0; }
@@ -168,22 +240,22 @@
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
-      padding: 12px 8px; 
+      padding: 10px 8px; 
       border-bottom: 1px solid #ffb6c1; 
-      font-size: 15px; 
+      font-size: 14px; 
     }
-    .item-actions { display: flex; align-items: center; gap: 10px; }
+    .item-actions { display: flex; align-items: center; gap: 8px; }
     
     .qty-edit { 
       background: #ffe3ed; 
       border: 1.5px solid var(--fuchsia-bright); 
       border-radius: 10px; 
-      padding: 5px 12px; 
+      padding: 4px 10px; 
       font-weight: 700; 
       cursor: pointer; 
       color: var(--primary-dark); 
     }
-    .btn-delete { color: #ff0055; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 6px; font-weight: bold; }
+    .btn-delete { color: #ff0055; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 4px; font-weight: bold; }
 
     nav.bottom-nav { 
       position: fixed; 
@@ -193,7 +265,7 @@
       background: #ffffff; 
       display: flex; 
       justify-content: space-around; 
-      padding: 12px 0 16px 0; 
+      padding: 10px 0 14px 0; 
       border-top: 3px solid var(--card-border); 
       z-index: 1000; 
       border-radius: 20px 20px 0 0;
@@ -205,40 +277,54 @@
       background: none; 
       border: none; 
       color: #b2bec3; 
-      font-size: 13px; 
+      font-size: 12px; 
       font-weight: 700; 
       cursor: pointer; 
-      gap: 4px; 
+      gap: 3px; 
       flex: 1; 
     }
     .nav-item.active { color: var(--fuchsia-bright); }
-    .nav-item svg { width: 28px; height: 28px; fill: currentColor; }
+    .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
 
-    .recap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; background: #ffffff; border-radius: 14px; overflow: hidden; }
-    .recap-table th, .recap-table td { border: 1px solid var(--card-border); padding: 10px 4px; text-align: center; }
-    .recap-table th, .recap-total { font-weight: 700; background-color: #ffe3ed; color: var(--primary-dark); }
-
-    .chart-container { width: 100%; height: 220px; margin: 10px 0; }
-
-    .backup-box { 
-      margin-top: 25px; 
-      padding: 20px; 
-      border: 2px dashed var(--fuchsia-bright); 
-      border-radius: 20px; 
-      background: #fff5f8; 
-      text-align: center; 
+    /* MODAL POPUP */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
     }
-    .btn-export { background: #00b894; color: white; padding: 12px 18px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; }
-    .btn-import { background: #0984e3; color: white; padding: 12px 18px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; display: inline-block; margin-top: 8px; }
+    .modal-card {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      border: 3px solid var(--fuchsia-bright);
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <!-- CE BLOC EST OBLIGATOIREMENT VISIBLE EN TOUT PREMIER -->
     <div class="welcome-banner">
       <h1 class="welcome-title">🌸 Bonjour Nathalie 👋 🌸</h1>
       <p class="welcome-quote">✨ « Manger mieux pour vivre mieux » ✨</p>
+    </div>
+
+    <!-- CERCLE DE JAUGE DE CALORIES -->
+    <div class="calorie-gauge-container">
+      <svg class="gauge-svg" viewBox="0 0 100 100">
+        <circle class="gauge-bg" cx="50" cy="50" r="40" />
+        <circle class="gauge-progress" id="gauge-circle" cx="50" cy="50" r="40" />
+      </svg>
+      <div class="gauge-info">
+        <div>Consommé : <span id="gauge-consumed">0</span> / <input type="number" id="target-kcal-input" value="1600" style="width:65px; padding:2px 5px;" onchange="updateGauge()"> kcal</div>
+        <div>Restant : <span id="gauge-remaining">1600</span> kcal</div>
+      </div>
     </div>
 
     <div class="date-nav">
@@ -263,45 +349,15 @@
           <button class="btn-add" onclick="saveWeight()">Enregistrer</button>
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-title">📉 Courbe d'Évolution</div>
-        <div class="chart-container" id="weight-chart"></div>
-      </div>
-
       <div class="card">
         <div class="card-title">📈 Historique des Pesées</div>
         <ul id="weight-history" class="item-list"></ul>
       </div>
     </div>
 
-    <div id="tab-activite" class="tab-content">
-      <div class="card">
-        <div class="card-title">🚶‍♀️ Saisie de la Marche du Jour</div>
-        <div class="input-group">
-          <label style="width:100%; font-weight:700; font-size:13px; margin-bottom:2px; color:var(--primary-dark);">Nombre de pas :</label>
-          <input type="number" id="activity-steps" class="input-flex" placeholder="ex: 8500 pas">
-        </div>
-        <div class="input-group">
-          <label style="width:100%; font-weight:700; font-size:13px; margin-bottom:2px; color:var(--primary-dark);">Distance (km) :</label>
-          <input type="number" step="0.1" id="activity-km" class="input-flex" placeholder="ex: 5.2 km">
-        </div>
-        <div class="input-group">
-          <label style="width:100%; font-weight:700; font-size:13px; margin-bottom:2px; color:var(--primary-dark);">Calories brûlées (kcal) :</label>
-          <input type="number" id="activity-kcal" class="input-flex" placeholder="ex: 320 kcal">
-        </div>
-        <button class="btn-add" style="width:100%; margin-top:8px;" onclick="addActivity()">Enregistrer la Marche</button>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📜 Historique de Marche</div>
-        <ul id="activity-list" class="item-list"></ul>
-      </div>
-    </div>
-
     <div id="tab-aliments" class="tab-content">
       <div class="card">
-        <div class="card-title">🍎 Ajouter un Aliment au Répertoire</div>
+        <div class="card-title">🍎 Ajouter un Aliment</div>
         <div class="input-group">
           <input type="text" id="new-food-name" class="input-flex" placeholder="Nom de l'aliment">
           <input type="number" id="new-food-kcal" class="input-small" placeholder="kcal/100g">
@@ -315,27 +371,21 @@
       </div>
     </div>
 
-    <div id="tab-recap" class="tab-content">
-      <div class="card">
-        <div class="card-title">📊 Récapitulatif Calories</div>
-        <div class="input-group">
-          <label style="align-self:center; font-weight:700; font-size:14px; color:var(--primary-dark);">Semaine :</label>
-          <select id="recap-week-select" onchange="renderRecapTable()" class="input-flex"></select>
-        </div>
-        <div id="recap-table-container"></div>
+  </div>
+
+  <!-- POPUP NOUVEL ALIMENT AUTOMATIQUE -->
+  <div class="modal-overlay" id="add-food-modal">
+    <div class="modal-card">
+      <h3 style="color:var(--fuchsia-bright); margin-top:0;">Aliment Inconnu 🌸</h3>
+      <p><strong id="modal-food-name-display"></strong> n'existe pas dans votre base.</p>
+      <div style="margin-bottom:15px;">
+        <input type="number" id="modal-food-kcal" placeholder="Calories pour 100g (kcal)" style="width:100%;">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn-add" style="flex:1;" onclick="confirmModalFood()">Enregistrer</button>
+        <button style="flex:1; background:#b2bec3; border:none; color:white; border-radius:14px; font-weight:700;" onclick="closeModal()">Annuler</button>
       </div>
     </div>
-
-    <div class="backup-box">
-      <h3 style="margin-top:0; font-size:16px; color: var(--primary-dark);">Restaurer / Sauvegarder</h3>
-      <label class="btn-import">
-        📂 CHARGER VOTRE FICHIER JSON
-        <input type="file" id="importFile" onchange="importerDonnees(event)" style="display: none;" accept=".json,.txt">
-      </label>
-      <br><br>
-      <button class="btn-export" onclick="exporterDonnees()">💾 Télécharger une sauvegarde</button>
-    </div>
-
   </div>
 
   <nav class="bottom-nav">
@@ -347,17 +397,9 @@
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg>
       Poids
     </button>
-    <button class="nav-item" onclick="switchTab('activite', event)">
-      <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg>
-      Marche
-    </button>
     <button class="nav-item" onclick="switchTab('aliments', event)">
       <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
       Aliments
-    </button>
-    <button class="nav-item" onclick="switchTab('recap', event)">
-      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-      Récap'
     </button>
   </nav>
 
@@ -365,6 +407,7 @@
     const REF_DATE = new Date(2026, 6, 27);
     const REF_WEEK = 15;
     let currentDate = new Date();
+    let currentPendingMeal = null;
 
     function getWeekNumber(d) {
       const date = new Date(d);
@@ -408,20 +451,14 @@
     function getMealData(dateKey) {
       let result = { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
       let dailyMeals = safeParse(localStorage.getItem('minceur_dailyMeals')) || safeParse(localStorage.getItem('dailyMeals')) || {};
-      dailyMeals = safeParse(dailyMeals);
-
+      
       if (dailyMeals && dailyMeals[dateKey]) {
         let dayData = dailyMeals[dateKey];
         MEAL_TYPES.forEach(m => {
           let arr = dayData[m] || dayData[m.toLowerCase()];
           if (Array.isArray(arr)) result[m] = arr;
         });
-        return result;
       }
-
-      let individual = safeParse(localStorage.getItem(`meals_${dateKey}`));
-      if (individual && typeof individual === 'object') return individual;
-
       return result;
     }
 
@@ -442,14 +479,12 @@
       
       renderMealsView(dateKey);
       renderWeightView(dateKey);
-      renderActivityList();
       renderFoodDB();
-      populateRecapWeekSelect();
+      updateGauge();
     }
 
     function renderMealsView(dateKey) {
       const mealsData = getMealData(dateKey);
-      const foodDB = getFoodDB();
       const container = document.getElementById('meals-container');
       container.innerHTML = '';
 
@@ -465,10 +500,8 @@
             <span>${mealKcal} kcal</span>
           </div>
           <div class="input-group">
-            <input type="text" list="food-options-${meal.replace(/ /g,'')}" id="input-food-${meal}" class="input-flex" placeholder="Nom de l'aliment">
-            <datalist id="food-options-${meal.replace(/ /g,'')}">
-              ${foodDB.map(f => `<option value="${f.name}">${f.kcal} kcal/100g</option>`).join('')}
-            </datalist>
+            <input type="text" id="input-food-${meal}" class="input-flex" placeholder="Nom de l'aliment (min. 2 lettres)" oninput="handleFoodInput('${meal}')" autocomplete="off">
+            <div id="autocomplete-${meal}" class="autocomplete-results"></div>
             <input type="number" id="input-qty-${meal}" class="input-small" placeholder="Grammes">
             <button class="btn-add" onclick="addFoodToMeal('${meal}')">+</button>
           </div>
@@ -493,15 +526,57 @@
       });
     }
 
+    /* AUTOCOMPLÉTION DÈS 2 LETTRES */
+    function handleFoodInput(meal) {
+      const input = document.getElementById(`input-food-${meal}`);
+      const val = input.value.trim().toLowerCase();
+      const resultsContainer = document.getElementById(`autocomplete-${meal}`);
+      
+      if (val.length < 2) {
+        resultsContainer.style.display = 'none';
+        return;
+      }
+
+      const db = getFoodDB();
+      const matches = db.filter(f => f.name.toLowerCase().includes(val));
+
+      if (matches.length === 0) {
+        resultsContainer.style.display = 'none';
+        return;
+      }
+
+      resultsContainer.innerHTML = matches.map(f => `
+        <div class="autocomplete-item" onclick="selectAutocomplete('${meal}', '${f.name}')">
+          ${f.name} <small style="color:#c71585">(${f.kcal} kcal/100g)</small>
+        </div>
+      `).join('');
+      resultsContainer.style.display = 'block';
+    }
+
+    function selectAutocomplete(meal, foodName) {
+      document.getElementById(`input-food-${meal}`).value = foodName;
+      document.getElementById(`autocomplete-${meal}`).style.display = 'none';
+    }
+
     function addFoodToMeal(meal) {
       const dateKey = formatDateKey(currentDate);
       const foodName = document.getElementById(`input-food-${meal}`).value.trim();
       const qty = parseFloat(document.getElementById(`input-qty-${meal}`).value);
-      const db = getFoodDB();
 
+      if (!foodName || !qty) {
+        alert("Veuillez saisir un aliment et sa quantité en grammes.");
+        return;
+      }
+
+      const db = getFoodDB();
       const foodObj = db.find(f => f.name.toLowerCase() === foodName.toLowerCase());
-      if (!foodObj || !qty) {
-        alert("Sélectionnez un aliment existant et entrez une quantité en grammes.");
+
+      /* SI L'ALIMENT N'EXISTE PAS -> OVERLAY POPUP AUTOMATIQUE */
+      if (!foodObj) {
+        currentPendingMeal = { meal, name: foodName, qty };
+        document.getElementById('modal-food-name-display').innerText = foodName;
+        document.getElementById('modal-food-kcal').value = '';
+        document.getElementById('add-food-modal').style.display = 'flex';
         return;
       }
 
@@ -511,23 +586,43 @@
       
       saveMealData(dateKey, mealsData);
       renderMealsView(dateKey);
+      updateGauge();
+    }
+
+    function confirmModalFood() {
+      const kcalPer100 = parseFloat(document.getElementById('modal-food-kcal').value);
+      if (!kcalPer100) return alert("Veuillez saisir les calories pour 100g.");
+
+      const db = getFoodDB();
+      db.push({ name: currentPendingMeal.name, kcal: kcalPer100 });
+      saveFoodDB(db);
+
+      closeModal();
+      renderFoodDB();
+
+      // Poursuivre l'ajout au repas
+      addFoodToMeal(currentPendingMeal.meal);
+    }
+
+    function closeModal() {
+      document.getElementById('add-food-modal').style.display = 'none';
     }
 
     function editItemQty(meal, idx) {
       const dateKey = formatDateKey(currentDate);
       const mealsData = getMealData(dateKey);
       const item = mealsData[meal][idx];
-      const currentQty = item.grams || item.qty || item.quantite || 100;
+      const currentQty = item.grams || item.qty || 100;
       const kcalPer100 = item.kcalPer100 || (item.kcalTotal ? Math.round((item.kcalTotal / currentQty) * 100) : 100);
 
-      const newQtyStr = prompt(`Quantité pour "${item.name || item.nom}" (g) :`, currentQty);
+      const newQtyStr = prompt(`Quantité pour "${item.name}" (g) :`, currentQty);
       if (newQtyStr !== null && parseFloat(newQtyStr) > 0) {
         const newQty = parseFloat(newQtyStr);
         item.grams = newQty;
-        item.qty = newQty;
         item.kcalTotal = Math.round((kcalPer100 * newQty) / 100);
         saveMealData(dateKey, mealsData);
         renderMealsView(dateKey);
+        updateGauge();
       }
     }
 
@@ -537,17 +632,36 @@
       mealsData[meal].splice(idx, 1);
       saveMealData(dateKey, mealsData);
       renderMealsView(dateKey);
+      updateGauge();
+    }
+
+    /* GAUGE DE CALORIES DYNAMIQUE */
+    function updateGauge() {
+      const dateKey = formatDateKey(currentDate);
+      const mealsData = getMealData(dateKey);
+      let consumed = 0;
+
+      MEAL_TYPES.forEach(m => {
+        (mealsData[m] || []).forEach(item => {
+          consumed += (item.kcalTotal || item.kcal || 0);
+        });
+      });
+
+      const target = parseFloat(document.getElementById('target-kcal-input').value) || 1600;
+      const remaining = Math.max(0, target - consumed);
+
+      document.getElementById('gauge-consumed').innerText = consumed;
+      document.getElementById('gauge-remaining').innerText = remaining;
+
+      const circle = document.getElementById('gauge-circle');
+      const maxOffset = 251.2;
+      const pct = Math.min(1, consumed / target);
+      circle.style.strokeDashoffset = maxOffset - (maxOffset * pct);
     }
 
     function getParsedWeights() {
-      let raw = safeParse(localStorage.getItem('minceur_weightLog')) || safeParse(localStorage.getItem('weight_history')) || safeParse(localStorage.getItem('poids')) || [];
-      let list = [];
-      if (Array.isArray(raw)) {
-        list = raw.map(w => ({ date: w.date || w.day, weight: parseFloat(w.weight || w.poids || 0) }));
-      } else if (typeof raw === 'object' && raw !== null) {
-        Object.keys(raw).forEach(k => { list.push({ date: k, weight: parseFloat(raw[k]) }); });
-      }
-      return list.filter(w => w.date && !isNaN(w.weight) && w.weight > 0);
+      let raw = safeParse(localStorage.getItem('minceur_weightLog')) || [];
+      return Array.isArray(raw) ? raw : [];
     }
 
     function renderWeightView(dateKey) {
@@ -565,43 +679,6 @@
         li.innerHTML = `<span>${w.date} (Sem. ${getWeekNumber(new Date(w.date))})</span><strong>${w.weight} kg</strong>`;
         historyUl.appendChild(li);
       });
-
-      renderWeightChart(weightsArr);
-    }
-
-    function renderWeightChart(dataArr) {
-      const container = document.getElementById('weight-chart');
-      if (!dataArr || dataArr.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#b2bec3; padding-top:80px;">Aucune donnée de poids enregistrée.</p>';
-        return;
-      }
-
-      const sorted = [...dataArr].sort((a,b) => a.date.localeCompare(b.date));
-      const weights = sorted.map(d => d.weight);
-      
-      const minW = Math.floor(Math.min(...weights) - 1);
-      const maxW = Math.ceil(Math.max(...weights) + 1);
-      
-      const width = 500, height = 200, padding = 35;
-      const getX = (i) => padding + (i / Math.max(sorted.length - 1, 1)) * (width - 2 * padding);
-      const getY = (w) => height - padding - ((w - minW) / Math.max(maxW - minW, 1)) * (height - 2 * padding);
-
-      let pointsPath = "", dotsSvg = "";
-
-      sorted.forEach((d, i) => {
-        const x = getX(i);
-        const y = getY(d.weight);
-        pointsPath += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
-        dotsSvg += `<circle cx="${x}" cy="${y}" r="6" fill="#ff007f" />`;
-        dotsSvg += `<text x="${x}" y="${y - 10}" font-size="12" text-anchor="middle" fill="#5c223a" font-weight="bold">${d.weight}</text>`;
-      });
-
-      container.innerHTML = `
-        <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:100%;">
-          <path d="${pointsPath}" fill="none" stroke="#ff007f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-          ${dotsSvg}
-        </svg>
-      `;
     }
 
     function saveWeight() {
@@ -613,59 +690,6 @@
       localStorage.setItem('minceur_weightLog', JSON.stringify(weightsArr));
       renderWeightView(dateKey);
       alert("Poids enregistré !");
-    }
-
-    function addActivity() {
-      const dateKey = formatDateKey(currentDate);
-      const steps = document.getElementById('activity-steps').value;
-      const km = document.getElementById('activity-km').value;
-      const kcal = document.getElementById('activity-kcal').value;
-
-      if (!steps && !km && !kcal) return alert("Veuillez saisir au moins une donnée.");
-
-      let activities = safeParse(localStorage.getItem('minceur_activityLog')) || safeParse(localStorage.getItem('minceur_activities')) || [];
-      activities = activities.filter(a => a.date !== dateKey);
-
-      activities.push({
-        id: Date.now(),
-        date: dateKey,
-        steps: steps || 0,
-        km: km || 0,
-        kcal: kcal || 0
-      });
-
-      localStorage.setItem('minceur_activityLog', JSON.stringify(activities));
-      document.getElementById('activity-steps').value = '';
-      document.getElementById('activity-km').value = '';
-      document.getElementById('activity-kcal').value = '';
-      renderActivityList();
-      alert("Marche enregistrée !");
-    }
-
-    function renderActivityList() {
-      let activities = safeParse(localStorage.getItem('minceur_activityLog')) || safeParse(localStorage.getItem('minceur_activities')) || [];
-      const ul = document.getElementById('activity-list');
-      ul.innerHTML = '';
-
-      activities.sort((a,b) => b.date.localeCompare(a.date)).forEach(act => {
-        const li = document.createElement('li');
-        li.className = 'item-row';
-        li.innerHTML = `
-          <div>
-            <strong>${act.date}</strong> (Sem. ${getWeekNumber(new Date(act.date))})<br>
-            <span style="font-size:13px; color:#c71585;">🚶 ${act.steps || 0} pas | ${act.km || 0} km | ${act.kcal || 0} kcal</span>
-          </div>
-          <button class="btn-delete" onclick="deleteActivity(${act.id})">✕</button>
-        `;
-        ul.appendChild(li);
-      });
-    }
-
-    function deleteActivity(id) {
-      let activities = safeParse(localStorage.getItem('minceur_activityLog')) || safeParse(localStorage.getItem('minceur_activities')) || [];
-      activities = activities.filter(a => a.id !== id);
-      localStorage.setItem('minceur_activityLog', JSON.stringify(activities));
-      renderActivityList();
     }
 
     function renderFoodDB() {
@@ -707,130 +731,12 @@
       renderFoodDB();
     }
 
-    function populateRecapWeekSelect() {
-      const select = document.getElementById('recap-week-select');
-      const currentW = getWeekNumber(new Date());
-      const selectedVal = select.value;
-      
-      select.innerHTML = '';
-      for (let w = 15; w <= Math.max(currentW + 5, 25); w++) {
-        const opt = document.createElement('option');
-        opt.value = w;
-        opt.innerText = `Semaine ${w}`;
-        if (selectedVal ? parseInt(selectedVal) === w : w === currentW) opt.selected = true;
-        select.appendChild(opt);
-      }
-      renderRecapTable();
-    }
-
-    function renderRecapTable() {
-      const targetWeek = parseInt(document.getElementById('recap-week-select').value) || 15;
-      const container = document.getElementById('recap-table-container');
-
-      const weeksDiff = targetWeek - REF_WEEK;
-      const mondayDate = new Date(REF_DATE);
-      mondayDate.setDate(mondayDate.getDate() + (weeksDiff * 7));
-
-      let html = `
-        <table class="recap-table">
-          <thead>
-            <tr>
-              <th>Jour</th>
-              <th>P.Déj</th>
-              <th>Déj</th>
-              <th>Col.</th>
-              <th>Dîn</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      let totalSemaine = 0;
-
-      for (let i = 0; i < 7; i++) {
-        const dayDate = new Date(mondayDate);
-        dayDate.setDate(dayDate.getDate() + i);
-        const dayKey = formatDateKey(dayDate);
-        const dayMeals = getMealData(dayKey);
-
-        const pDej = (dayMeals['Petit-déjeuner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
-        const dej = (dayMeals['Déjeuner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
-        const col = (dayMeals['Collation'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
-        const din = (dayMeals['Dîner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
-        
-        const dayTotal = pDej + dej + col + din;
-        totalSemaine += dayTotal;
-
-        const dayName = dayDate.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
-
-        html += `
-          <tr>
-            <td><strong>${dayName}</strong></td>
-            <td>${pDej || '-'}</td>
-            <td>${dej || '-'}</td>
-            <td>${col || '-'}</td>
-            <td>${din || '-'}</td>
-            <td class="recap-total">${dayTotal ? dayTotal + ' kcal' : '-'}</td>
-          </tr>
-        `;
-      }
-
-      html += `
-          </tbody>
-          <tfoot>
-            <tr class="recap-total">
-              <td colspan="5">TOTAL SEMAINE ${targetWeek}</td>
-              <td>${totalSemaine} kcal</td>
-            </tr>
-          </tfoot>
-        </table>
-      `;
-
-      container.innerHTML = html;
-    }
-
     function switchTab(tabId, evt) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
       document.getElementById(`tab-${tabId}`).classList.add('active');
       if (evt) evt.currentTarget.classList.add('active');
-
-      if (tabId === 'recap') populateRecapWeekSelect();
-    }
-
-    function exporterDonnees() {
-      const data = JSON.stringify(localStorage);
-      const blob = new Blob([data], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `sauvegarde_carnet_${formatDateKey(new Date())}.json`;
-      a.click();
-    }
-
-    function importerDonnees(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          let content = e.target.result;
-          let parsed = JSON.parse(content);
-          if (typeof parsed === 'string') parsed = JSON.parse(parsed);
-
-          for (let k in parsed) {
-            let val = parsed[k];
-            localStorage.setItem(k, typeof val === 'string' ? val : JSON.stringify(val));
-          }
-
-          alert('✅ Sauvegarde restaurée avec succès !');
-          updateAppView();
-        } catch (err) {
-          alert('❌ Fichier invalide.');
-        }
-      };
-      reader.readAsText(file);
     }
   </script>
 </body>
