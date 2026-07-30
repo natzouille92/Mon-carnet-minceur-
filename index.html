@@ -32,7 +32,6 @@
     .card { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid #f7e6eb; }
     .card-title { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary); margin-bottom: 10px; font-size: 16px; border-bottom: 1px dashed #f0d8df; padding-bottom: 8px; }
 
-    /* Forms & Inputs */
     .input-group { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
     input, select { padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
     input:focus { border-color: var(--primary); }
@@ -40,7 +39,6 @@
     .input-small { width: 75px; }
     button.btn-add { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-    /* Lists */
     .item-list { list-style: none; padding: 0; margin: 0; }
     .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f7; font-size: 14px; }
     .item-row:last-child { border-bottom: none; }
@@ -48,26 +46,22 @@
     .qty-edit { background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 4px; padding: 2px 6px; font-weight: bold; cursor: pointer; color: var(--secondary); }
     .btn-delete { color: #e53e3e; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 4px; }
 
-    /* Quick Create Food Box */
     .quick-create-food { background: #fffaf0; border: 1px solid #feebc8; padding: 10px; border-radius: 8px; margin-top: 8px; display: none; }
     .quick-create-food p { margin: 0 0 6px 0; font-size: 12px; color: #dd6b20; font-weight: bold; }
 
-    /* Bottom Navigation */
-    nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #f0d8df; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; }
+    nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-style: space-around; padding: 10px 0; border-top: 1px solid #f0d8df; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; }
     .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #a0aec0; font-size: 11px; cursor: pointer; gap: 3px; }
     .nav-item.active { color: var(--primary); font-weight: bold; }
     .nav-item svg { width: 20px; height: 20px; fill: currentColor; }
 
-    /* Tables for Recap */
-    .recap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-    .recap-table th, .recap-table td { border: 1px solid #edf2f7; padding: 8px; text-align: center; }
+    .recap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+    .recap-table th, .recap-table td { border: 1px solid #edf2f7; padding: 6px 4px; text-align: center; }
     .recap-table th { background-color: var(--primary-light); color: var(--primary); }
+    .recap-table input { width: 100%; text-align: center; padding: 4px; border: 1px dashed #cbd5e0; font-size: 12px; border-radius: 4px; }
     .recap-total { font-weight: bold; background-color: #f7fafc; }
 
-    /* Chart Container */
     .chart-container { width: 100%; height: 220px; margin: 15px 0; }
 
-    /* Backup Box */
     .backup-box { margin-top: 25px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; background: white; text-align: center; }
     .btn-export { background: var(--accent-green); color: white; padding: 8px 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
     .btn-import { background: var(--accent-blue); color: white; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-block; }
@@ -76,7 +70,7 @@
 <body>
 
   <header>
-    <h1 id="app-title">Mon Carnet Minceur</h1>
+    <h1>Mon Carnet Minceur</h1>
     <div class="date-nav">
       <button onclick="changeDate(-1)">❮</button>
       <span id="current-date-display">...</span>
@@ -116,12 +110,12 @@
     <!-- ONGLET 3 : ACTIVITÉ -->
     <div id="tab-activite" class="tab-content">
       <div class="card">
-        <div class="card-title">🏃‍♀️ Saisir une activité (Marche)</div>
+        <div class="card-title">🏃‍♀️ Saisir une activité</div>
         <div class="input-group">
           <input type="date" id="activity-date" class="input-flex">
         </div>
         <div class="input-group">
-          <input type="number" id="activity-duration" class="input-flex" placeholder="Durée (minutes)">
+          <input type="number" id="activity-duration" class="input-flex" placeholder="Durée (min)">
           <input type="number" id="activity-steps" class="input-flex" placeholder="Nombre de pas">
           <button class="btn-add" onclick="addActivity()">Ajouter</button>
         </div>
@@ -135,7 +129,7 @@
     <!-- ONGLET 4 : ALIMENTS -->
     <div id="tab-aliments" class="tab-content">
       <div class="card">
-        <div class="card-title">🍎 Ajouter un aliment à la base</div>
+        <div class="card-title">🍎 Ajouter un aliment</div>
         <div class="input-group">
           <input type="text" id="new-food-name" class="input-flex" placeholder="Nom (ex: Pomme)">
           <input type="number" id="new-food-kcal" class="input-small" placeholder="kcal/100g">
@@ -144,7 +138,7 @@
       </div>
       <div class="card">
         <div class="card-title">📖 Ma liste d'aliments</div>
-        <input type="text" id="search-food-db" placeholder="🔍 Rechercher dans ma base..." style="width:100%; margin-bottom:10px;" oninput="renderFoodDB()">
+        <input type="text" id="search-food-db" placeholder="🔍 Rechercher..." style="width:100%; margin-bottom:10px;" oninput="renderFoodDB()">
         <ul id="food-db-list" class="item-list"></ul>
       </div>
     </div>
@@ -157,7 +151,7 @@
           <label style="align-self:center; font-weight:bold; font-size:13px;">Semaine :</label>
           <select id="recap-week-select" onchange="renderRecapTable()" class="input-flex"></select>
         </div>
-        <p style="font-size:11px; color:#718096; margin-top:-5px; margin-bottom:10px;">Note : Le récapitulatif se calcule automatiquement d'après les repas renseignés dans l'onglet <strong>Repas</strong>.</p>
+        <p style="font-size:11px; color:#718096; margin-top:-5px; margin-bottom:10px;">Vous pouvez soit laisser les totaux se calculer automatiquement, soit saisir/modifier directement les valeurs dans les cases.</p>
         <div id="recap-table-container"></div>
       </div>
     </div>
@@ -165,7 +159,7 @@
     <!-- SAUVEGARDE ET RESTAURATION -->
     <div class="backup-box">
       <h3 style="margin-top:0; font-size:15px; color:var(--text);">Sauvegarde de vos données</h3>
-      <p style="font-size:12px; color:#666; margin-bottom:12px;">Téléchargez une sauvegarde régulière pour sécuriser vos données.</p>
+      <p style="font-size:12px; color:#666; margin-bottom:12px;">Importez votre fichier de sauvegarde pour tout restaurer.</p>
       <button class="btn-export" onclick="exporterDonnees()">💾 Exporter mes données</button>
       <span style="display:inline-block; width:8px;"></span>
       <label class="btn-import">
@@ -176,34 +170,32 @@
 
   </div>
 
-  <!-- NAVIGATION EN BAS -->
   <nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('repas')">
+    <button class="nav-item active" onclick="switchTab('repas', event)">
       <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.46 3.9 3.45 4.35L4 22h2.1l1.9-8h2l1.9 8H14l-2.45-8.65C13.54 12.9 15 11.12 15 9V2h-2v7h-2zm9-7h-3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h1v8h2V4c0-1.1-.9-2-2-2z"/></svg>
       Repas
     </button>
-    <button class="nav-item" onclick="switchTab('poids')">
+    <button class="nav-item" onclick="switchTab('poids', event)">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg>
       Poids
     </button>
-    <button class="nav-item" onclick="switchTab('activite')">
+    <button class="nav-item" onclick="switchTab('activite', event)">
       <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg>
       Activité
     </button>
-    <button class="nav-item" onclick="switchTab('aliments')">
+    <button class="nav-item" onclick="switchTab('aliments', event)">
       <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
       Aliments
     </button>
-    <button class="nav-item" onclick="switchTab('recap')">
+    <button class="nav-item" onclick="switchTab('recap', event)">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
       Récap' Kcal
     </button>
   </nav>
 
   <script>
-    const REF_DATE = new Date(2026, 3, 20); // Alignement sur le premier relevé de pesée (20 avril 2026)
+    const REF_DATE = new Date(2026, 3, 20); // 20 Avril 2026
     const REF_WEEK = 15;
-
     let currentDate = new Date();
 
     function getWeekNumber(d) {
@@ -212,7 +204,6 @@
       const day = date.getDay();
       const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
       const monday = new Date(date.setDate(diffToMonday));
-      
       const diffTime = monday.getTime() - REF_DATE.getTime();
       const diffWeeks = Math.round(diffTime / (7 * 24 * 60 * 60 * 1000));
       return REF_WEEK + diffWeeks;
@@ -226,8 +217,7 @@
     }
 
     function formatDateDisplay(d) {
-      const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
-      return d.toLocaleDateString('fr-FR', options);
+      return d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     }
 
     function changeDate(delta) {
@@ -235,22 +225,23 @@
       updateAppView();
     }
 
-    // --- SUPPORT COMPATIBILITÉ STRUCTURES ---
-    function parseStorageJson(key) {
-      const raw = localStorage.getItem(key);
-      if (!raw) return null;
-      try {
-        let parsed = JSON.parse(raw);
-        if (typeof parsed === 'string') parsed = JSON.parse(parsed);
-        return parsed;
-      } catch (e) {
-        return null;
+    // --- LECTURE ULTRA SÉCURISÉE DES DONNÉES EN CACHE ---
+    function parseDeepJson(val) {
+      let data = val;
+      for (let i = 0; i < 3; i++) {
+        if (typeof data === 'string') {
+          try { data = JSON.parse(data); } catch(e) { break; }
+        }
       }
+      return data;
+    }
+
+    function getStorageItem(key) {
+      return parseDeepJson(localStorage.getItem(key));
     }
 
     function getFoodDB() {
-      const stored = parseStorageJson('minceur_foodDb') || parseStorageJson('food_db') || parseStorageJson('aliments');
-      return stored || [
+      return getStorageItem('minceur_foodDb') || getStorageItem('food_db') || getStorageItem('aliments') || [
         { name: "Activia vanille", kcal: 92 },
         { name: "Aiguillettes de poulet", kcal: 118 }
       ];
@@ -258,18 +249,16 @@
 
     function saveFoodDB(db) {
       localStorage.setItem('minceur_foodDb', JSON.stringify(db));
-      localStorage.setItem('food_db', JSON.stringify(db));
     }
 
     const MEAL_TYPES = ['Petit-déjeuner', 'Déjeuner', 'Collation', 'Dîner'];
 
     function getMealData(dateKey) {
-      let stored = parseStorageJson(`meals_${dateKey}`) || parseStorageJson(`repas_${dateKey}`);
+      let stored = getStorageItem(`meals_${dateKey}`) || getStorageItem(`repas_${dateKey}`);
       if (!stored) {
-        const allMeals = parseStorageJson('minceur_meals') || {};
+        const allMeals = getStorageItem('minceur_meals') || {};
         stored = allMeals[dateKey];
       }
-
       if (stored) {
         MEAL_TYPES.forEach(m => { if (!stored[m]) stored[m] = []; });
         return stored;
@@ -279,7 +268,7 @@
 
     function saveMealData(dateKey, data) {
       localStorage.setItem(`meals_${dateKey}`, JSON.stringify(data));
-      const allMeals = parseStorageJson('minceur_meals') || {};
+      let allMeals = getStorageItem('minceur_meals') || {};
       allMeals[dateKey] = data;
       localStorage.setItem('minceur_meals', JSON.stringify(allMeals));
     }
@@ -319,16 +308,16 @@
             <span style="font-size:14px; color:var(--primary);">${mealKcal} kcal</span>
           </div>
           <div class="input-group">
-            <input type="text" list="food-options-${meal.replace(/ /g,'')}" id="input-food-${meal}" class="input-flex" placeholder="Chercher un aliment..." oninput="checkFoodExists('${meal}')">
+            <input type="text" list="food-options-${meal.replace(/ /g,'')}" id="input-food-${meal}" class="input-flex" placeholder="Aliment..." oninput="checkFoodExists('${meal}')">
             <datalist id="food-options-${meal.replace(/ /g,'')}">
               ${foodDB.map(f => `<option value="${f.name}">${f.kcal} kcal/100g</option>`).join('')}
             </datalist>
-            <input type="number" id="input-qty-${meal}" class="input-small" placeholder="Grammes">
+            <input type="number" id="input-qty-${meal}" class="input-small" placeholder="Grams">
             <button class="btn-add" onclick="addFoodToMeal('${meal}')">+</button>
           </div>
           
           <div id="quick-create-${meal}" class="quick-create-food">
-            <p>Cet aliment n'existe pas. Créer rapidement :</p>
+            <p>Aliment non trouvé. Créer rapidement :</p>
             <div class="input-group">
               <input type="number" id="quick-kcal-${meal}" class="input-flex" placeholder="Kcal pour 100g">
               <button class="btn-add" style="background:var(--accent-blue);" onclick="quickCreateAndAdd('${meal}')">Créer & Ajouter</button>
@@ -343,7 +332,7 @@
               <li class="item-row">
                 <span><strong>${item.name || item.nom}</strong></span>
                 <div class="item-actions">
-                  <span class="qty-edit" title="Cliquez pour modifier" onclick="editItemQty('${meal}', ${idx})">${qtyDisplay}g</span>
+                  <span class="qty-edit" onclick="editItemQty('${meal}', ${idx})">${qtyDisplay}g</span>
                   <span style="font-size:12px; color:#718096;">${kcalDisplay} kcal</span>
                   <button class="btn-delete" onclick="deleteMealItem('${meal}', ${idx})">✕</button>
                 </div>
@@ -367,11 +356,7 @@
       const db = getFoodDB();
       const exists = db.some(f => f.name.toLowerCase() === val.toLowerCase());
       const quickBox = document.getElementById(`quick-create-${meal}`);
-      if (val.length > 1 && !exists) {
-        quickBox.style.display = 'block';
-      } else {
-        quickBox.style.display = 'none';
-      }
+      quickBox.style.display = (val.length > 1 && !exists) ? 'block' : 'none';
     }
 
     function addFoodToMeal(meal) {
@@ -382,7 +367,7 @@
 
       const foodObj = db.find(f => f.name.toLowerCase() === foodName.toLowerCase());
       if (!foodObj || !qty) {
-        alert("Veuillez sélectionner un aliment dans la liste et entrer une quantité.");
+        alert("Choisissez un aliment valide et entrez une quantité.");
         return;
       }
 
@@ -397,10 +382,7 @@
     function quickCreateAndAdd(meal) {
       const foodName = document.getElementById(`input-food-${meal}`).value.trim();
       const kcalPer100 = parseFloat(document.getElementById(`quick-kcal-${meal}`).value);
-      if (!foodName || !kcalPer100) {
-        alert("Veuillez remplir le nom et le nombre de calories.");
-        return;
-      }
+      if (!foodName || !kcalPer100) return alert("Remplissez le nom et les calories.");
       
       const db = getFoodDB();
       db.push({ name: foodName, kcal: kcalPer100 });
@@ -414,20 +396,17 @@
       const dateKey = formatDateKey(currentDate);
       const mealsData = getMealData(dateKey);
       const item = mealsData[meal][idx];
-
       const currentQty = item.qty || item.quantite || 100;
       const kcalPer100 = item.kcalPer100 || (item.kcalTotal ? Math.round((item.kcalTotal / currentQty) * 100) : 100);
 
-      const newQtyStr = prompt(`Modifier la quantité pour "${item.name || item.nom}" (en grammes) :`, currentQty);
-      if (newQtyStr !== null) {
+      const newQtyStr = prompt(`Quantité pour "${item.name || item.nom}" (g) :`, currentQty);
+      if (newQtyStr !== null && parseFloat(newQtyStr) > 0) {
         const newQty = parseFloat(newQtyStr);
-        if (newQty > 0) {
-          item.qty = newQty;
-          item.kcalTotal = Math.round((kcalPer100 * newQty) / 100);
-          item.kcalPer100 = kcalPer100;
-          saveMealData(dateKey, mealsData);
-          renderMealsView(dateKey);
-        }
+        item.qty = newQty;
+        item.kcalTotal = Math.round((kcalPer100 * newQty) / 100);
+        item.kcalPer100 = kcalPer100;
+        saveMealData(dateKey, mealsData);
+        renderMealsView(dateKey);
       }
     }
 
@@ -439,23 +418,23 @@
       renderMealsView(dateKey);
     }
 
-    /* --- RENDU POIDS & GRAPHIQUE SVG --- */
-    function renderWeightView(dateKey) {
-      let rawWeights = parseStorageJson('minceur_weightLog') || parseStorageJson('weight_history') || parseStorageJson('poids') || [];
-      let weightsArr = [];
-
-      if (Array.isArray(rawWeights)) {
-        weightsArr = rawWeights.filter(w => w.date && w.weight);
-      } else if (typeof rawWeights === 'object') {
-        Object.keys(rawWeights).forEach(k => {
-          weightsArr.push({ date: k, weight: parseFloat(rawWeights[k]) });
-        });
+    /* --- GESTION DU POIDS ET RENDU DU GRAPHIQUE --- */
+    function getParsedWeights() {
+      let raw = getStorageItem('minceur_weightLog') || getStorageItem('weight_history') || getStorageItem('poids') || [];
+      let list = [];
+      if (Array.isArray(raw)) {
+        list = raw.map(w => ({ date: w.date || w.day, weight: parseFloat(w.weight || w.poids || 0) }));
+      } else if (typeof raw === 'object' && raw !== null) {
+        Object.keys(raw).forEach(k => { list.push({ date: k, weight: parseFloat(raw[k]) }); });
       }
+      return list.filter(w => w.date && !isNaN(w.weight) && w.weight > 0);
+    }
 
+    function renderWeightView(dateKey) {
+      const weightsArr = getParsedWeights();
       const todayObj = weightsArr.find(w => w.date === dateKey);
       document.getElementById('weight-input').value = todayObj ? todayObj.weight : '';
 
-      // Historique
       const historyUl = document.getElementById('weight-history');
       historyUl.innerHTML = '';
       
@@ -467,7 +446,6 @@
         historyUl.appendChild(li);
       });
 
-      // Rendu Graphique
       renderWeightChart(weightsArr);
     }
 
@@ -478,37 +456,27 @@
         return;
       }
 
-      // Trier par date croissante pour le tracé
       const sorted = [...dataArr].sort((a,b) => a.date.localeCompare(b.date));
-      const weights = sorted.map(d => parseFloat(d.weight));
+      const weights = sorted.map(d => d.weight);
       
       const minW = Math.floor(Math.min(...weights) - 1);
       const maxW = Math.ceil(Math.max(...weights) + 1);
       
-      const width = 500;
-      const height = 200;
-      const padding = 35;
+      const width = 500, height = 200, padding = 35;
+      const getX = (i) => padding + (i / Math.max(sorted.length - 1, 1)) * (width - 2 * padding);
+      const getY = (w) => height - padding - ((w - minW) / Math.max(maxW - minW, 1)) * (height - 2 * padding);
 
-      const getX = (i) => padding + (i / (sorted.length - 1 || 1)) * (width - 2 * padding);
-      const getY = (w) => height - padding - ((w - minW) / (maxW - minW || 1)) * (height - 2 * padding);
-
-      let pointsPath = "";
-      let dotsSvg = "";
+      let pointsPath = "", dotsSvg = "", gridSvg = "";
 
       sorted.forEach((d, i) => {
         const x = getX(i);
-        const y = getY(parseFloat(d.weight));
-        if (i === 0) {
-          pointsPath += `M ${x} ${y}`;
-        } else {
-          pointsPath += ` L ${x} ${y}`;
-        }
+        const y = getY(d.weight);
+        pointsPath += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
         dotsSvg += `<circle cx="${x}" cy="${y}" r="4" fill="#e8637a" />`;
         dotsSvg += `<text x="${x}" y="${y - 8}" font-size="10" text-anchor="middle" fill="#4a5568" font-weight="bold">${d.weight}</text>`;
       });
 
-      let gridSvg = "";
-      for (let w = minW; w <= maxW; w += 2) {
+      for (let w = minW; w <= maxW; w += (maxW - minW > 10 ? 2 : 1)) {
         const y = getY(w);
         gridSvg += `<line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="#edf2f7" stroke-dasharray="3,3" />`;
         gridSvg += `<text x="${padding - 5}" y="${y + 3}" font-size="10" text-anchor="end" fill="#a0aec0">${w}</text>`;
@@ -526,13 +494,10 @@
     function saveWeight() {
       const dateKey = formatDateKey(currentDate);
       const val = parseFloat(document.getElementById('weight-input').value);
-      let rawWeights = parseStorageJson('minceur_weightLog') || [];
-      
-      if (!Array.isArray(rawWeights)) rawWeights = [];
-      rawWeights = rawWeights.filter(w => w.date !== dateKey);
-      if (val) rawWeights.push({ date: dateKey, weight: val });
+      let weightsArr = getParsedWeights().filter(w => w.date !== dateKey);
+      if (val) weightsArr.push({ date: dateKey, weight: val });
 
-      localStorage.setItem('minceur_weightLog', JSON.stringify(rawWeights));
+      localStorage.setItem('minceur_weightLog', JSON.stringify(weightsArr));
       renderWeightView(dateKey);
       alert("Poids enregistré !");
     }
@@ -542,37 +507,26 @@
       const duration = document.getElementById('activity-duration').value;
       const steps = document.getElementById('activity-steps').value;
 
-      if (!actDate || (!duration && !steps)) {
-        alert("Veuillez choisir une date et entrer la durée ou les pas.");
-        return;
-      }
+      if (!actDate) return alert("Sélectionnez une date.");
 
-      let activities = parseStorageJson('minceur_activityLog') || parseStorageJson('activity_history') || [];
-      activities.push({
-        id: Date.now(),
-        date: actDate,
-        duration: duration || 0,
-        steps: steps || 0
-      });
+      let activities = getStorageItem('minceur_activityLog') || [];
+      activities.push({ id: Date.now(), date: actDate, duration: duration || 0, steps: steps || 0 });
 
       localStorage.setItem('minceur_activityLog', JSON.stringify(activities));
-      document.getElementById('activity-duration').value = '';
-      document.getElementById('activity-steps').value = '';
       renderActivityList();
     }
 
     function renderActivityList() {
-      let activities = parseStorageJson('minceur_activityLog') || parseStorageJson('activity_history') || [];
+      let activities = getStorageItem('minceur_activityLog') || [];
       const ul = document.getElementById('activity-list');
       ul.innerHTML = '';
 
       activities.sort((a,b) => b.date.localeCompare(a.date)).forEach(act => {
-        const weekNum = getWeekNumber(new Date(act.date));
         const li = document.createElement('li');
         li.className = 'item-row';
         li.innerHTML = `
           <div>
-            <strong>${act.date}</strong> <small style="color:#718096;">(Sem. ${weekNum})</small><br>
+            <strong>${act.date}</strong> <small style="color:#718096;">(Sem. ${getWeekNumber(new Date(act.date))})</small><br>
             <span style="font-size:12px; color:var(--secondary);">🚶 Marche : ${act.duration || 0} min | ${act.steps || 0} pas</span>
           </div>
           <button class="btn-delete" onclick="deleteActivity(${act.id})">✕</button>
@@ -582,7 +536,7 @@
     }
 
     function deleteActivity(id) {
-      let activities = parseStorageJson('minceur_activityLog') || parseStorageJson('activity_history') || [];
+      let activities = getStorageItem('minceur_activityLog') || [];
       activities = activities.filter(a => a.id !== id);
       localStorage.setItem('minceur_activityLog', JSON.stringify(activities));
       renderActivityList();
@@ -590,7 +544,7 @@
 
     function renderFoodDB() {
       const db = getFoodDB();
-      const search = document.getElementById('search-food-db').value.toLowerCase();
+      const search = (document.getElementById('search-food-db').value || '').toLowerCase();
       const ul = document.getElementById('food-db-list');
       ul.innerHTML = '';
 
@@ -613,26 +567,21 @@
     function addCustomFood() {
       const name = document.getElementById('new-food-name').value.trim();
       const kcal = parseFloat(document.getElementById('new-food-kcal').value);
-      if (!name || !kcal) {
-        alert("Veuillez renseigner le nom et les calories.");
-        return;
-      }
+      if (!name || !kcal) return alert("Nom et calories requis.");
+      
       const db = getFoodDB();
       db.push({ name: name, kcal: kcal });
       saveFoodDB(db);
-      document.getElementById('new-food-name').value = '';
-      document.getElementById('new-food-kcal').value = '';
       renderFoodDB();
-      renderMealsView(formatDateKey(currentDate));
     }
 
     function deleteCustomFood(name) {
-      let db = getFoodDB();
-      db = db.filter(f => f.name !== name);
+      let db = getFoodDB().filter(f => f.name !== name);
       saveFoodDB(db);
       renderFoodDB();
     }
 
+    /* --- RÉCAPITULATIF DES CALORIES AVEC SAISIE DIRECTE --- */
     function populateRecapWeekSelect() {
       const select = document.getElementById('recap-week-select');
       const currentW = getWeekNumber(new Date());
@@ -643,9 +592,7 @@
         const opt = document.createElement('option');
         opt.value = w;
         opt.innerText = `Semaine ${w}`;
-        if (selectedVal ? parseInt(selectedVal) === w : w === currentW) {
-          opt.selected = true;
-        }
+        if (selectedVal ? parseInt(selectedVal) === w : w === currentW) opt.selected = true;
         select.appendChild(opt);
       }
       renderRecapTable();
@@ -654,7 +601,12 @@
     function renderRecapTable() {
       const targetWeek = parseInt(document.getElementById('recap-week-select').value) || 15;
       const container = document.getElementById('recap-table-container');
-      
+      const manualOverrides = getStorageItem('recap_manual_kcal') || {};
+
+      const weeksDiff = targetWeek - REF_WEEK;
+      const mondayDate = new Date(REF_DATE);
+      mondayDate.setDate(mondayDate.getDate() + (weeksDiff * 7));
+
       let html = `
         <table class="recap-table">
           <thead>
@@ -670,10 +622,6 @@
           <tbody>
       `;
 
-      const weeksDiff = targetWeek - REF_WEEK;
-      const mondayDate = new Date(REF_DATE);
-      mondayDate.setDate(mondayDate.getDate() + (weeksDiff * 7));
-
       let totalSemaine = 0;
 
       for (let i = 0; i < 7; i++) {
@@ -682,10 +630,17 @@
         const dayKey = formatDateKey(dayDate);
         const dayMeals = getMealData(dayKey);
 
-        const pDej = (dayMeals['Petit-déjeuner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
-        const dej = (dayMeals['Déjeuner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
-        const col = (dayMeals['Collation'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
-        const din = (dayMeals['Dîner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
+        const getMealKcal = (meal) => {
+          if (manualOverrides[dayKey] && manualOverrides[dayKey][meal] !== undefined) {
+            return manualOverrides[dayKey][meal];
+          }
+          return (dayMeals[meal] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
+        };
+
+        const pDej = getMealKcal('Petit-déjeuner');
+        const dej = getMealKcal('Déjeuner');
+        const col = getMealKcal('Collation');
+        const din = getMealKcal('Dîner');
         const dayTotal = pDej + dej + col + din;
         totalSemaine += dayTotal;
 
@@ -694,11 +649,11 @@
         html += `
           <tr>
             <td><strong>${dayName}</strong></td>
-            <td>${pDej || '-'}</td>
-            <td>${dej || '-'}</td>
-            <td>${col || '-'}</td>
-            <td>${din || '-'}</td>
-            <td class="recap-total">${dayTotal ? dayTotal + ' kcal' : '-'}</td>
+            <td><input type="number" value="${pDej || ''}" placeholder="-" onchange="saveManualRecap('${dayKey}', 'Petit-déjeuner', this.value)"></td>
+            <td><input type="number" value="${dej || ''}" placeholder="-" onchange="saveManualRecap('${dayKey}', 'Déjeuner', this.value)"></td>
+            <td><input type="number" value="${col || ''}" placeholder="-" onchange="saveManualRecap('${dayKey}', 'Collation', this.value)"></td>
+            <td><input type="number" value="${din || ''}" placeholder="-" onchange="saveManualRecap('${dayKey}', 'Dîner', this.value)"></td>
+            <td class="recap-total">${dayTotal ? dayTotal : '-'}</td>
           </tr>
         `;
       }
@@ -717,30 +672,31 @@
       container.innerHTML = html;
     }
 
-    function switchTab(tabId) {
+    function saveManualRecap(dayKey, meal, value) {
+      let manual = getStorageItem('recap_manual_kcal') || {};
+      if (!manual[dayKey]) manual[dayKey] = {};
+      manual[dayKey][meal] = value !== '' ? parseInt(value) : 0;
+      localStorage.setItem('recap_manual_kcal', JSON.stringify(manual));
+      renderRecapTable();
+    }
+
+    function switchTab(tabId, evt) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
       document.getElementById(`tab-${tabId}`).classList.add('active');
-      event.currentTarget.classList.add('active');
+      if (evt) evt.currentTarget.classList.add('active');
 
-      if (tabId === 'recap') {
-        populateRecapWeekSelect();
-      }
+      if (tabId === 'recap') populateRecapWeekSelect();
     }
 
     function exporterDonnees() {
-      const donnees = JSON.stringify(localStorage);
-      const blob = new Blob([donnees], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
+      const data = JSON.stringify(localStorage);
+      const blob = new Blob([data], { type: 'application/json' });
       const a = document.createElement('a');
-      const date = new Date().toISOString().slice(0, 10);
-      a.href = url;
-      a.download = `sauvegarde_carnet_${date}.json`;
-      document.body.appendChild(a);
+      a.href = URL.createObjectURL(blob);
+      a.download = `sauvegarde_carnet_${formatDateKey(new Date())}.json`;
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
     }
 
     function importerDonnees(event) {
@@ -749,14 +705,15 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
-          const donnees = JSON.parse(e.target.result);
-          for (let key in donnees) {
-            localStorage.setItem(key, typeof donnees[key] === 'object' ? JSON.stringify(donnees[key]) : donnees[key]);
+          const parsed = JSON.parse(e.target.result);
+          localStorage.clear();
+          for (let k in parsed) {
+            localStorage.setItem(k, typeof parsed[k] === 'string' ? parsed[k] : JSON.stringify(parsed[k]));
           }
-          alert('✅ Sauvegarde restaurée avec succès !');
+          alert('✅ Données restaurées avec succès !');
           updateAppView();
         } catch (err) {
-          alert('❌ Erreur lors de la lecture du fichier de sauvegarde.');
+          alert('❌ Erreur de lecture du fichier de sauvegarde.');
         }
       };
       reader.readAsText(file);
