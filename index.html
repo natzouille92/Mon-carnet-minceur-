@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Carnet Minceur 🌸</title>
-  <!-- Polices douces et très girly : Quicksand & Poppins -->
+  <!-- Polices ultra douces et girly -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -33,20 +33,32 @@
       font-size: 15px; 
     }
     
+    /* HEADER ULTRA GIRLY / FLORAL */
     header { 
-      background: #ffffff; 
-      padding: 16px 15px; 
+      background: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%); 
+      padding: 18px 15px; 
       text-align: center; 
-      border-bottom: 3px solid var(--card-border); 
+      border-bottom: 3px dashed #ff9ebb; 
       position: sticky; 
       top: 0; 
       z-index: 100; 
-      box-shadow: 0 4px 15px rgba(255, 117, 160, 0.15); 
-      border-radius: 0 0 20px 20px;
+      box-shadow: 0 6px 20px rgba(255, 117, 160, 0.2); 
+      border-radius: 0 0 25px 25px;
     }
+    
+    .header-title-box {
+      background: #ffffff;
+      display: inline-block;
+      padding: 8px 22px;
+      border-radius: 30px;
+      border: 2px solid #fcc2d7;
+      box-shadow: 0 4px 12px rgba(255, 117, 160, 0.15);
+      position: relative;
+    }
+
     header h1 { 
       margin: 0; 
-      font-size: 24px; 
+      font-size: 22px; 
       color: var(--primary-dark); 
       font-weight: 700; 
       letter-spacing: 0.5px; 
@@ -57,11 +69,12 @@
       align-items: center; 
       justify-content: center; 
       gap: 15px; 
-      margin-top: 10px; 
+      margin-top: 12px; 
       font-weight: 700; 
       font-size: 18px; 
       color: var(--primary-dark);
     }
+    
     .date-nav button { 
       background: #ffe3ed; 
       border: 2px solid var(--primary-pink); 
@@ -77,13 +90,14 @@
       font-weight: bold;
       box-shadow: 0 2px 6px rgba(214, 51, 108, 0.15);
     }
+
     .week-badge { 
       background: linear-gradient(135deg, #ff75a0, #d6336c); 
       color: white; 
-      padding: 6px 18px; 
+      padding: 6px 20px; 
       border-radius: 20px; 
-      font-size: 13px; 
-      margin-top: 8px; 
+      font-size: 14px; 
+      margin-top: 10px; 
       display: inline-block; 
       font-weight: 700; 
       box-shadow: 0 3px 10px rgba(214, 51, 108, 0.3); 
@@ -93,7 +107,7 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* CARTES ULTRA GIRLY ET ROSÉES */
+    /* CARTES Ultra Douces */
     .card { 
       background: var(--card-bg); 
       border-radius: 22px; 
@@ -110,7 +124,7 @@
       font-weight: 700; 
       color: var(--primary-dark); 
       margin-bottom: 14px; 
-      font-size: 18px; 
+      font-size: 17px; 
       background: #ffe8f0; 
       padding: 10px 16px; 
       border-radius: 16px; 
@@ -170,7 +184,7 @@
     }
     .btn-delete { color: #ff5252; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 6px; font-weight: bold; }
 
-    /* BARRE DE NAVIGATION ROSE */
+    /* NAVIGATION BASSE */
     nav.bottom-nav { 
       position: fixed; 
       bottom: 0; 
@@ -223,7 +237,9 @@
 <body>
 
   <header>
-    <h1>Mon Carnet Minceur 🌸</h1>
+    <div class="header-title-box">
+      <h1>🌸 Mon Carnet Minceur 🌸</h1>
+    </div>
     <div class="date-nav">
       <button onclick="changeDate(-1)">❮</button>
       <span id="current-date-display">...</span>
@@ -351,7 +367,8 @@
   </nav>
 
   <script>
-    const REF_DATE = new Date(2026, 3, 20);
+    // FIXATION DE LA SEMAINE 15 AU LUNDI 27 JUILLET 2026
+    const REF_DATE = new Date(2026, 6, 27); // 27 Juillet 2026
     const REF_WEEK = 15;
     let currentDate = new Date();
 
@@ -362,7 +379,7 @@
       const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
       const monday = new Date(date.setDate(diffToMonday));
       const diffTime = monday.getTime() - REF_DATE.getTime();
-      const diffWeeks = Math.round(diffTime / (7 * 24 * 60 * 60 * 1000));
+      const diffWeeks = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000));
       return REF_WEEK + diffWeeks;
     }
 
@@ -432,7 +449,7 @@
     function updateAppView() {
       const dateKey = formatDateKey(currentDate);
       document.getElementById('current-date-display').innerText = formatDateDisplay(currentDate);
-      document.getElementById('week-display').innerText = `Semaine ${getWeekNumber(currentDate)}`;
+      document.getElementById('week-display').innerText = `🌸 Semaine ${getWeekNumber(currentDate)} 🌸`;
       
       renderMealsView(dateKey);
       renderWeightView(dateKey);
@@ -707,7 +724,7 @@
       const selectedVal = select.value;
       
       select.innerHTML = '';
-      for (let w = 15; w <= Math.max(currentW + 2, 25); w++) {
+      for (let w = 15; w <= Math.max(currentW + 5, 25); w++) {
         const opt = document.createElement('option');
         opt.value = w;
         opt.innerText = `Semaine ${w}`;
