@@ -304,6 +304,29 @@
       margin: 3px 0;
     }
 
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .stat-box {
+      background: #ffffff;
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+    }
+    .stat-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--fuchsia-bright);
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+    }
+
     nav.bottom-nav { 
       position: fixed; 
       bottom: 0; 
@@ -324,14 +347,14 @@
       background: none; 
       border: none; 
       color: #b2bec3; 
-      font-size: 12px; 
+      font-size: 11px; 
       font-weight: 700; 
       cursor: pointer; 
       gap: 3px; 
       flex: 1; 
     }
     .nav-item.active { color: var(--fuchsia-bright); }
-    .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
+    .nav-item svg { width: 22px; height: 22px; fill: currentColor; }
 
     .modal-overlay {
       position: fixed;
@@ -384,10 +407,12 @@
 
   <div class="container">
 
+    <!-- REPAS -->
     <div id="tab-repas" class="tab-content active">
       <div id="meals-container"></div>
     </div>
 
+    <!-- POIDS -->
     <div id="tab-poids" class="tab-content">
       <div class="card">
         <div class="card-title">⚖️ Poids du Jour</div>
@@ -397,7 +422,6 @@
         </div>
       </div>
 
-      <!-- GRAPHIC 55KG A 85KG AVEC DATES ET SANS TEXTE SUR LA COURBE -->
       <div class="card">
         <div class="card-title">📈 Évolution du Poids</div>
         <div id="chart-container">
@@ -411,6 +435,46 @@
       </div>
     </div>
 
+    <!-- ACTIVITÉ & MARCHE -->
+    <div id="tab-activite" class="tab-content">
+      <div class="card">
+        <div class="card-title">🚶‍♀️ Marche du Jour</div>
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div class="stat-val" id="display-steps">0</div>
+            <div class="stat-label">Pas</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="display-distance">0.0 km</div>
+            <div class="stat-label">Distance estimée</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="display-duration">0 min</div>
+            <div class="stat-label">Durée</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="display-burned">0 kcal</div>
+            <div class="stat-label">Brûlées</div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <input type="number" id="input-steps" class="input-flex" placeholder="Nombre de pas (ex: 7500)" oninput="autoCalculateActivity()">
+        </div>
+        <div class="input-group">
+          <input type="number" id="input-duration" class="input-flex" placeholder="Durée en minutes (ex: 45)">
+          <input type="number" id="input-burned" class="input-flex" placeholder="Calories brûlées (ex: 220)">
+        </div>
+        <button class="btn-add" style="width:100%;" onclick="saveActivity()">Enregistrer la Marche</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📜 Historique d'Activité</div>
+        <ul id="activity-history" class="item-list"></ul>
+      </div>
+    </div>
+
+    <!-- BASE ALIMENTS -->
     <div id="tab-aliments" class="tab-content">
       <div class="card">
         <div class="card-title">🍎 Ajouter un Aliment</div>
@@ -427,6 +491,7 @@
       </div>
     </div>
 
+    <!-- RÉCAP' -->
     <div id="tab-recap" class="tab-content">
       <div class="card">
         <div class="card-title">📊 Bilan de la Semaine en Cours</div>
@@ -435,7 +500,7 @@
 
       <div class="card">
         <div class="card-title">💾 Sauvegarde & Restauration</div>
-        <p style="font-size:13px; color:#666; margin-bottom:12px;">Conservez une copie de vos repas et pesées sur votre téléphone.</p>
+        <p style="font-size:13px; color:#666; margin-bottom:12px;">Conservez une copie de vos repas, pesées et activités sur votre téléphone.</p>
         <button class="btn-add" style="width:100%; margin-bottom:10px;" onclick="exportData()">📥 Sauvegarder mes données</button>
         <button class="btn-secondary" onclick="triggerImport()">📤 Importer des données</button>
         <input type="file" id="import-file-input" style="display:none;" onchange="importData(event)">
@@ -444,6 +509,7 @@
 
   </div>
 
+  <!-- POPUP ALIMENT INCONNU -->
   <div class="modal-overlay" id="add-food-modal">
     <div class="modal-card">
       <h3 style="color:var(--fuchsia-bright); margin-top:0;">Aliment Inconnu 🌸</h3>
@@ -458,6 +524,7 @@
     </div>
   </div>
 
+  <!-- NAVIGATION SECTIONS -->
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="switchTab('repas', event)">
       <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.46 3.9 3.45 4.35L4 22h2.1l1.9-8h2l1.9 8H14l-2.45-8.65C13.54 12.9 15 11.12 15 9V2h-2v7h-2zm9-7h-3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h1v8h2V4c0-1.1-.9-2-2-2z"/></svg>
@@ -466,6 +533,10 @@
     <button class="nav-item" onclick="switchTab('poids', event)">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg>
       Poids
+    </button>
+    <button class="nav-item" onclick="switchTab('activite', event)">
+      <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L5 8.3V13h2V9.6l2.8-.7z"/></svg>
+      Activité
     </button>
     <button class="nav-item" onclick="switchTab('aliments', event)">
       <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
@@ -553,6 +624,7 @@
       
       renderMealsView(dateKey);
       renderWeightView(dateKey);
+      renderActivityView(dateKey);
       renderFoodDB();
       updateGauge();
       renderWeeklyRecap();
@@ -751,6 +823,71 @@
       circle.style.strokeDashoffset = maxOffset - (maxOffset * pct);
     }
 
+    /* GESTION DE L'ACTIVITÉ ET MARCHE */
+    function getActivityLog() {
+      let raw = safeParse(localStorage.getItem('minceur_activityLog')) || {};
+      return raw;
+    }
+
+    function autoCalculateActivity() {
+      const steps = parseFloat(document.getElementById('input-steps').value) || 0;
+      if (steps > 0) {
+        const dist = (steps * 0.0007).toFixed(1);
+        const duration = Math.round(steps / 100);
+        const burned = Math.round(steps * 0.04);
+
+        if (!document.getElementById('input-duration').value) {
+          document.getElementById('input-duration').value = duration;
+        }
+        if (!document.getElementById('input-burned').value) {
+          document.getElementById('input-burned').value = burned;
+        }
+      }
+    }
+
+    function saveActivity() {
+      const dateKey = formatDateKey(currentDate);
+      const steps = parseInt(document.getElementById('input-steps').value) || 0;
+      const duration = parseInt(document.getElementById('input-duration').value) || 0;
+      const burned = parseInt(document.getElementById('input-burned').value) || 0;
+      const distance = (steps * 0.0007).toFixed(1);
+
+      let log = getActivityLog();
+      log[dateKey] = { steps, duration, burned, distance };
+
+      localStorage.setItem('minceur_activityLog', JSON.stringify(log));
+      updateAppView();
+      alert("Marche enregistrée !");
+    }
+
+    function renderActivityView(dateKey) {
+      const log = getActivityLog();
+      const today = log[dateKey] || { steps: 0, duration: 0, burned: 0, distance: 0 };
+
+      document.getElementById('display-steps').innerText = today.steps.toLocaleString();
+      document.getElementById('display-distance').innerText = `${today.distance || 0} km`;
+      document.getElementById('display-duration').innerText = `${today.duration} min`;
+      document.getElementById('display-burned').innerText = `${today.burned} kcal`;
+
+      document.getElementById('input-steps').value = today.steps || '';
+      document.getElementById('input-duration').value = today.duration || '';
+      document.getElementById('input-burned').value = today.burned || '';
+
+      const historyUl = document.getElementById('activity-history');
+      historyUl.innerHTML = '';
+      
+      const sortedKeys = Object.keys(log).sort((a,b) => b.localeCompare(a));
+      sortedKeys.forEach(k => {
+        const act = log[k];
+        if (act.steps > 0) {
+          const li = document.createElement('li');
+          li.className = 'item-row';
+          li.innerHTML = `<span>${k}</span><strong>🚶‍♀️ ${act.steps} pas (${act.distance} km) - 🔥 ${act.burned} kcal</strong>`;
+          historyUl.appendChild(li);
+        }
+      });
+    }
+
     function renderWeeklyRecap() {
       const container = document.getElementById('weekly-recap-container');
       container.innerHTML = '';
@@ -827,7 +964,6 @@
       drawWeightChart(weightsArr);
     }
 
-    /* TRACÉ AVEC AXES STRUCTURÉS : 55KG À 85KG EN ORDONNÉES, DATES EN ABSCISSES */
     function drawWeightChart(dataArr) {
       const canvas = document.getElementById('weight-chart');
       const ctx = canvas.getContext('2d');
@@ -843,7 +979,6 @@
       const width = canvas.width - paddingLeft - paddingRight;
       const height = canvas.height - paddingTop - paddingBottom;
 
-      // Dessiner l'axe des ordonnées (De 55kg à 85kg avec paliers de 10kg)
       ctx.textAlign = "right";
       ctx.font = "bold 11px Quicksand";
       ctx.fillStyle = "#888";
@@ -872,7 +1007,6 @@
       const sorted = [...dataArr].sort((a,b) => a.date.localeCompare(b.date));
       const stepX = sorted.length > 1 ? width / (sorted.length - 1) : width / 2;
 
-      // Tracé de la ligne rose
       ctx.beginPath();
       ctx.strokeStyle = "#ff007f";
       ctx.lineWidth = 3;
@@ -887,13 +1021,11 @@
       });
       ctx.stroke();
 
-      // Points et dates en abscisse
       sorted.forEach((d, i) => {
         const wVal = Math.min(Math.max(parseFloat(d.weight), minW), maxW);
         const x = sorted.length === 1 ? paddingLeft + (width / 2) : paddingLeft + (i * stepX);
         const y = canvas.height - paddingBottom - (((wVal - minW) / (maxW - minW)) * height);
 
-        // Point uniquement (sans texte au-dessus)
         ctx.beginPath();
         ctx.arc(x, y, 5, 0, Math.PI * 2);
         ctx.fillStyle = "#c71585";
@@ -902,7 +1034,6 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Date en abscisses (format jj/mm)
         const dObj = new Date(d.date);
         const dateStr = `${dObj.getDate()}/${dObj.getMonth() + 1}`;
         ctx.fillStyle = "#666";
@@ -973,7 +1104,8 @@
       const data = {
         foodDb: getFoodDB(),
         dailyMeals: safeParse(localStorage.getItem('minceur_dailyMeals')) || safeParse(localStorage.getItem('dailyMeals')) || {},
-        weightLog: getParsedWeights()
+        weightLog: getParsedWeights(),
+        activityLog: getActivityLog()
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
@@ -997,6 +1129,7 @@
           if (data.foodDb) localStorage.setItem('minceur_foodDb', JSON.stringify(data.foodDb));
           if (data.dailyMeals) localStorage.setItem('minceur_dailyMeals', JSON.stringify(data.dailyMeals));
           if (data.weightLog) localStorage.setItem('minceur_weightLog', JSON.stringify(data.weightLog));
+          if (data.activityLog) localStorage.setItem('minceur_activityLog', JSON.stringify(data.activityLog));
           alert("Données importées avec succès !");
           updateAppView();
         } catch(err) {
