@@ -267,6 +267,44 @@
     }
     .btn-delete { color: #ff0055; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 4px; font-weight: bold; }
 
+    /* STYLES COURBE DE POIDS ET RÉCAP' */
+    #chart-container {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 10px;
+      border: 1.5px solid var(--card-border);
+      text-align: center;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .recap-day-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      border: 1.5px solid var(--card-border);
+    }
+    .recap-day-title {
+      font-weight: 700;
+      color: var(--primary-dark);
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #ffe3ed;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .recap-sub-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #666;
+      margin: 3px 0;
+    }
+
     nav.bottom-nav { 
       position: fixed; 
       bottom: 0; 
@@ -307,12 +345,13 @@
     }
     .modal-card {
       background: white;
-      padding: 20px;
+      padding: 22px;
       border-radius: 20px;
       width: 90%;
       max-width: 400px;
       border: 3px solid var(--fuchsia-bright);
       text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
   </style>
 </head>
@@ -324,7 +363,6 @@
       <p class="welcome-quote">✨ « Manger mieux pour vivre mieux » ✨</p>
     </div>
 
-    <!-- JAUGE DE CALORIES -->
     <div class="calorie-gauge-container">
       <svg class="gauge-svg" viewBox="0 0 100 100">
         <circle class="gauge-bg" cx="50" cy="50" r="40" />
@@ -358,8 +396,17 @@
           <button class="btn-add" onclick="saveWeight()">Enregistrer</button>
         </div>
       </div>
+
+      <!-- COURBE DE POIDS AVEC DATES -->
       <div class="card">
-        <div class="card-title">📈 Historique des Pesées</div>
+        <div class="card-title">📈 Évolution du Poids</div>
+        <div id="chart-container">
+          <canvas id="weight-chart" width="500" height="250"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Historique des Pesées</div>
         <ul id="weight-history" class="item-list"></ul>
       </div>
     </div>
@@ -380,13 +427,10 @@
       </div>
     </div>
 
-    <!-- ONGLET RÉCAPITULATIF DES CALORIES ET SAUVEGARDE -->
     <div id="tab-recap" class="tab-content">
       <div class="card">
-        <div class="card-title">📊 Récapitulatif de la Journée</div>
-        <ul class="item-list" id="recap-breakdown">
-          <!-- Rempli en JS -->
-        </ul>
+        <div class="card-title">📊 Bilan de la Semaine en Cours</div>
+        <div id="weekly-recap-container"></div>
       </div>
 
       <div class="card">
@@ -400,11 +444,11 @@
 
   </div>
 
-  <!-- POPUP NOUVEL ALIMENT AUTOMATIQUE -->
+  <!-- POPUP ALIMENT INCONNU -->
   <div class="modal-overlay" id="add-food-modal">
     <div class="modal-card">
       <h3 style="color:var(--fuchsia-bright); margin-top:0;">Aliment Inconnu 🌸</h3>
-      <p><strong id="modal-food-name-display"></strong> n'existe pas dans votre base.</p>
+      <p style="margin-bottom:15px; font-size:14px;"><strong id="modal-food-name-display" style="color:var(--primary-dark);"></strong> n'est pas encore enregistré dans votre base.</p>
       <div style="margin-bottom:15px;">
         <input type="number" id="modal-food-kcal" placeholder="Calories pour 100g (kcal)" style="width:100%;">
       </div>
@@ -494,7 +538,7 @@
     }
 
     function saveMealData(dateKey, data) {
-      let dailyMeals = safeParse(localStorage.getItem('minceur_dailyMeals')) || {};
+      let dailyMeals = safeParse(localStorage.getItem('minceur_dailyMeals')) || safeParse(localStorage.getItem('dailyMeals')) || {};
       dailyMeals[dateKey] = data;
       localStorage.setItem('minceur_dailyMeals', JSON.stringify(dailyMeals));
     }
@@ -512,7 +556,7 @@
       renderWeightView(dateKey);
       renderFoodDB();
       updateGauge();
-      renderRecapView(dateKey);
+      renderWeeklyRecap();
     }
 
     function renderMealsView(dateKey) {
@@ -569,18 +613,24 @@
       }
 
       const db = getFoodDB();
-      const matches = db.filter(f => f.name && f.name.toLowerCase().includes(val));
+      const matches = db.filter(f => {
+        let name = f.name || f.nom || '';
+        return name.toLowerCase().includes(val);
+      });
 
       if (matches.length === 0) {
         resultsContainer.style.display = 'none';
         return;
       }
 
-      resultsContainer.innerHTML = matches.map(f => `
-        <div class="autocomplete-item" onclick="selectAutocomplete('${meal}', '${f.name.replace(/'/g, "\\'")}')">
-          ${f.name} <small style="color:#c71585">(${f.kcal} kcal/100g)</small>
+      resultsContainer.innerHTML = matches.map(f => {
+        let foodName = f.name || f.nom;
+        let foodKcal = f.kcal || f.kcalPer100 || 0;
+        return `
+        <div class="autocomplete-item" onclick="selectAutocomplete('${meal}', '${foodName.replace(/'/g, "\\'")}')">
+          ${foodName} <small style="color:#c71585">(${foodKcal} kcal/100g)</small>
         </div>
-      `).join('');
+      `}).join('');
       resultsContainer.style.display = 'block';
     }
 
@@ -602,9 +652,11 @@
       }
 
       const db = getFoodDB();
-      const foodObj = db.find(f => f.name && f.name.toLowerCase() === foodName.toLowerCase());
+      const foodObj = db.find(f => {
+        let name = f.name || f.nom || '';
+        return name.toLowerCase() === foodName.toLowerCase();
+      });
 
-      /* OUVERTURE DU POPUP SI INCONNU */
       if (!foodObj) {
         currentPendingMeal = { meal, name: foodName, qty };
         document.getElementById('modal-food-name-display').innerText = foodName;
@@ -613,11 +665,14 @@
         return;
       }
 
-      const kcalTotal = Math.round((foodObj.kcal * qty) / 100);
+      const per100 = foodObj.kcal || foodObj.kcalPer100 || 0;
+      const kcalTotal = Math.round((per100 * qty) / 100);
       const mealsData = getMealData(dateKey);
-      mealsData[meal].push({ name: foodObj.name, grams: qty, kcalTotal: kcalTotal, kcalPer100: foodObj.kcal });
+      mealsData[meal].push({ name: foodObj.name || foodObj.nom, grams: qty, kcalTotal: kcalTotal, kcalPer100: per100 });
       
       saveMealData(dateKey, mealsData);
+      foodInput.value = '';
+      qtyInput.value = '';
       updateAppView();
     }
 
@@ -638,6 +693,10 @@
       mealsData[currentPendingMeal.meal].push({ name: currentPendingMeal.name, grams: currentPendingMeal.qty, kcalTotal: kcalTotal, kcalPer100: kcalPer100 });
       
       saveMealData(dateKey, mealsData);
+      
+      document.getElementById(`input-food-${currentPendingMeal.meal}`).value = '';
+      document.getElementById(`input-qty-${currentPendingMeal.meal}`).value = '';
+      
       updateAppView();
     }
 
@@ -652,7 +711,7 @@
       const currentQty = item.grams || item.qty || 100;
       const kcalPer100 = item.kcalPer100 || (item.kcalTotal ? Math.round((item.kcalTotal / currentQty) * 100) : 100);
 
-      const newQtyStr = prompt(`Quantité pour "${item.name}" (g) :`, currentQty);
+      const newQtyStr = prompt(`Quantité pour "${item.name || item.nom}" (g) :`, currentQty);
       if (newQtyStr !== null && parseFloat(newQtyStr) > 0) {
         const newQty = parseFloat(newQtyStr);
         item.grams = newQty;
@@ -693,36 +752,56 @@
       circle.style.strokeDashoffset = maxOffset - (maxOffset * pct);
     }
 
-    /* AFFICHAGE DE DU RÉCAPITULATIF DES CALORIES */
-    function renderRecapView(dateKey) {
-      const mealsData = getMealData(dateKey);
-      const ul = document.getElementById('recap-breakdown');
-      ul.innerHTML = '';
+    function renderWeeklyRecap() {
+      const container = document.getElementById('weekly-recap-container');
+      container.innerHTML = '';
 
-      let totalDay = 0;
+      const curr = new Date(currentDate);
+      const day = curr.getDay();
+      const diffToMonday = curr.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(curr.setDate(diffToMonday));
 
-      MEAL_TYPES.forEach(m => {
-        const items = mealsData[m] || [];
-        const mealTotal = items.reduce((sum, item) => sum + (item.kcalTotal || item.kcal || 0), 0);
-        totalDay += mealTotal;
+      let totalWeekKcal = 0;
 
-        const li = document.createElement('li');
-        li.className = 'item-row';
-        li.innerHTML = `<span>${m}</span><strong>${mealTotal} kcal</strong>`;
-        ul.appendChild(li);
-      });
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const dKey = formatDateKey(d);
+        const dayMeals = getMealData(dKey);
+        
+        let dayKcal = 0;
+        let mealDetailsHtml = '';
 
-      const target = parseFloat(document.getElementById('target-kcal-input').value) || 1600;
-      const summaryLi = document.createElement('li');
-      summaryLi.className = 'item-row';
-      summaryLi.style.borderTop = '2px solid var(--fuchsia-bright)';
-      summaryLi.style.marginTop = '10px';
-      summaryLi.style.paddingTop = '10px';
-      summaryLi.innerHTML = `
-        <span><strong>Total Consommé</strong></span>
-        <strong style="color:var(--fuchsia-bright); font-size:16px;">${totalDay} / ${target} kcal</strong>
-      `;
-      ul.appendChild(summaryLi);
+        MEAL_TYPES.forEach(m => {
+          const items = dayMeals[m] || [];
+          const mKcal = items.reduce((sum, item) => sum + (item.kcalTotal || item.kcal || 0), 0);
+          dayKcal += mKcal;
+          if (mKcal > 0) {
+            mealDetailsHtml += `<div class="recap-sub-row"><span>• ${m}</span><span>${mKcal} kcal</span></div>`;
+          }
+        });
+
+        totalWeekKcal += dayKcal;
+
+        const dayCard = document.createElement('div');
+        dayCard.className = 'recap-day-card';
+        dayCard.innerHTML = `
+          <div class="recap-day-title">
+            <span>${formatDateDisplay(d)}</span>
+            <span style="color:var(--fuchsia-bright);">${dayKcal} kcal</span>
+          </div>
+          ${mealDetailsHtml || '<div style="font-size:12px; color:#aaa; font-style:italic;">Aucun repas enregistré</div>'}
+        `;
+        container.appendChild(dayCard);
+      }
+
+      const summaryCard = document.createElement('div');
+      summaryCard.style.padding = '10px';
+      summaryCard.style.textAlign = 'center';
+      summaryCard.style.fontWeight = '700';
+      summaryCard.style.color = 'var(--primary-dark)';
+      summaryCard.innerHTML = `Total de la semaine : <span style="color:var(--fuchsia-bright); font-size:18px;">${totalWeekKcal} kcal</span>`;
+      container.prepend(summaryCard);
     }
 
     function getParsedWeights() {
@@ -745,6 +824,77 @@
         li.innerHTML = `<span>${w.date} (Sem. ${getWeekNumber(new Date(w.date))})</span><strong>${w.weight} kg</strong>`;
         historyUl.appendChild(li);
       });
+
+      drawWeightChart(weightsArr);
+    }
+
+    /* TRACÉ COMPLÈTEMENT DYNAMIQUE DU GRAPHIQUE AVEC DATES */
+    function drawWeightChart(dataArr) {
+      const canvas = document.getElementById('weight-chart');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (dataArr.length === 0) {
+        ctx.fillStyle = "#aaa";
+        ctx.font = "14px Quicksand";
+        ctx.fillText("Aucune donnée de poids pour le moment", 130, 125);
+        return;
+      }
+
+      // Trier du plus ancien au plus récent
+      const sorted = [...dataArr].sort((a,b) => a.date.localeCompare(b.date));
+      
+      const padding = 40;
+      const width = canvas.width - (padding * 2);
+      const height = canvas.height - (padding * 2);
+
+      const weights = sorted.map(d => parseFloat(d.weight));
+      let minW = Math.min(...weights) - 1;
+      let maxW = Math.max(...weights) + 1;
+      if (minW === maxW) { minW -= 1; maxW += 1; }
+
+      const stepX = sorted.length > 1 ? width / (sorted.length - 1) : width / 2;
+
+      // Dessiner la ligne de tendance
+      ctx.beginPath();
+      ctx.strokeStyle = "#ff007f";
+      ctx.lineWidth = 3;
+
+      sorted.forEach((d, i) => {
+        const x = sorted.length === 1 ? canvas.width / 2 : padding + (i * stepX);
+        const y = canvas.height - padding - (((parseFloat(d.weight) - minW) / (maxW - minW)) * height);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Dessiner les points, la valeur et la date
+      sorted.forEach((d, i) => {
+        const x = sorted.length === 1 ? canvas.width / 2 : padding + (i * stepX);
+        const y = canvas.height - padding - (((parseFloat(d.weight) - minW) / (maxW - minW)) * height);
+
+        // Point
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = "#c71585";
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Afficher le Poids (au-dessus du point)
+        ctx.fillStyle = "#4a0033";
+        ctx.font = "bold 11px Quicksand";
+        ctx.textAlign = "center";
+        ctx.fillText(`${d.weight} kg`, x, y - 10);
+
+        // Afficher la Date (en-dessous du graphique)
+        const dObj = new Date(d.date);
+        const dateStr = `${dObj.getDate()}/${dObj.getMonth() + 1}`;
+        ctx.fillStyle = "#666";
+        ctx.font = "10px Quicksand";
+        ctx.fillText(dateStr, x, canvas.height - 10);
+      });
     }
 
     function saveWeight() {
@@ -764,20 +914,25 @@
       const ul = document.getElementById('food-db-list');
       ul.innerHTML = '';
 
-      db.filter(f => f.name && f.name.toLowerCase().includes(search))
-        .sort((a,b) => a.name.localeCompare(b.name))
-        .forEach((f) => {
-          const li = document.createElement('li');
-          li.className = 'item-row';
-          li.innerHTML = `
-            <span><strong>${f.name}</strong></span>
-            <div class="item-actions">
-              <span>${f.kcal} kcal/100g</span>
-              <button class="btn-delete" onclick="deleteCustomFood('${f.name.replace(/'/g, "\\'")}')">✕</button>
-            </div>
-          `;
-          ul.appendChild(li);
-        });
+      db.filter(f => {
+        let name = f.name || f.nom || '';
+        return name.toLowerCase().includes(search);
+      })
+      .sort((a,b) => (a.name || a.nom).localeCompare(b.name || b.nom))
+      .forEach((f) => {
+        let fName = f.name || f.nom;
+        let fKcal = f.kcal || f.kcalPer100 || 0;
+        const li = document.createElement('li');
+        li.className = 'item-row';
+        li.innerHTML = `
+          <span><strong>${fName}</strong></span>
+          <div class="item-actions">
+            <span>${fKcal} kcal/100g</span>
+            <button class="btn-delete" onclick="deleteCustomFood('${fName.replace(/'/g, "\\'")}')">✕</button>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
     }
 
     function addCustomFood() {
@@ -794,7 +949,7 @@
     }
 
     function deleteCustomFood(name) {
-      let db = getFoodDB().filter(f => f.name !== name);
+      let db = getFoodDB().filter(f => (f.name || f.nom) !== name);
       saveFoodDB(db);
       renderFoodDB();
     }
@@ -802,7 +957,7 @@
     function exportData() {
       const data = {
         foodDb: getFoodDB(),
-        dailyMeals: safeParse(localStorage.getItem('minceur_dailyMeals')) || {},
+        dailyMeals: safeParse(localStorage.getItem('minceur_dailyMeals')) || safeParse(localStorage.getItem('dailyMeals')) || {},
         weightLog: getParsedWeights()
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
