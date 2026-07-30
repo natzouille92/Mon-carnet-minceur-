@@ -191,8 +191,6 @@
   </nav>
 
   <script>
-    // --- GESTION DES DATES & SEMAINES ---
-    // Point de référence : Lundi 27 Juillet 2026 = Semaine 15
     const REF_DATE = new Date(2026, 6, 27);
     const REF_WEEK = 15;
 
@@ -227,49 +225,55 @@
       updateAppView();
     }
 
-    // --- BASE DE DONNÉES ALIMENTS ---
-    const defaultFoods = [
-      { name: "Pomme", kcal: 52 },
-      { name: "Poulet (blanc)", kcal: 120 },
-      { name: "Riz cuit", kcal: 130 },
-      { name: "Pain complet", kcal: 247 },
-      { name: "Huile d'olive", kcal: 884 },
-      { name: "Oeuf", kcal: 155 },
-      { name: "Flocons d'avoine", kcal: 368 },
-      { name: "Yaourt nature", kcal: 50 },
-      { name: "Pâtes cuites", kcal: 131 },
-      { name: "Banane", kcal: 89 }
-    ];
+    // --- SUPPORT COMPATIBILITÉ STRUCTURES ---
+    function parseStorageJson(key) {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      try {
+        let parsed = JSON.parse(raw);
+        if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
 
     function getFoodDB() {
-      const stored = localStorage.getItem('food_db') || localStorage.getItem('aliments');
-      return stored ? JSON.parse(stored) : defaultFoods;
+      const stored = parseStorageJson('minceur_foodDb') || parseStorageJson('food_db') || parseStorageJson('aliments');
+      return stored || [
+        { name: "Pomme", kcal: 52 },
+        { name: "Poulet (blanc)", kcal: 120 }
+      ];
     }
 
     function saveFoodDB(db) {
+      localStorage.setItem('minceur_foodDb', JSON.stringify(db));
       localStorage.setItem('food_db', JSON.stringify(db));
     }
 
-    // --- DONNÉES REPAS ---
     const MEAL_TYPES = ['Petit-déjeuner', 'Déjeuner', 'Collation', 'Dîner'];
 
     function getMealData(dateKey) {
-      // Lecture compatible ancienne & nouvelle structure
-      let stored = localStorage.getItem(`meals_${dateKey}`) || localStorage.getItem(`repas_${dateKey}`);
+      let stored = parseStorageJson(`meals_${dateKey}`) || parseStorageJson(`repas_${dateKey}`);
+      if (!stored) {
+        const allMeals = parseStorageJson('minceur_meals') || {};
+        stored = allMeals[dateKey];
+      }
+
       if (stored) {
-        let parsed = JSON.parse(stored);
-        MEAL_TYPES.forEach(m => { if (!parsed[m]) parsed[m] = []; });
-        return parsed;
+        MEAL_TYPES.forEach(m => { if (!stored[m]) stored[m] = []; });
+        return stored;
       }
       return { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
     }
 
     function saveMealData(dateKey, data) {
       localStorage.setItem(`meals_${dateKey}`, JSON.stringify(data));
-      localStorage.setItem(`repas_${dateKey}`, JSON.stringify(data));
+      const allMeals = parseStorageJson('minceur_meals') || {};
+      allMeals[dateKey] = data;
+      localStorage.setItem('minceur_meals', JSON.stringify(allMeals));
     }
 
-    // --- INITIALISATION ---
     window.onload = function() {
       document.getElementById('activity-date').value = formatDateKey(currentDate);
       updateAppView();
@@ -287,7 +291,6 @@
       populateRecapWeekSelect();
     }
 
-    // --- ONGLET 1 : REPAS ---
     function renderMealsView(dateKey) {
       const mealsData = getMealData(dateKey);
       const foodDB = getFoodDB();
@@ -369,7 +372,7 @@
 
       const foodObj = db.find(f => f.name.toLowerCase() === foodName.toLowerCase());
       if (!foodObj || !qty) {
-        alert("Veuillez sélectionner un aliment valide dans la liste et entrer une quantité.");
+        alert("Veuillez sélectionner un aliment dans la liste et entrer une quantité.");
         return;
       }
 
@@ -426,19 +429,26 @@
       renderMealsView(dateKey);
     }
 
-    // --- ONGLET 2 : POIDS ---
     function renderWeightView(dateKey) {
-      const weights = JSON.parse(localStorage.getItem('weight_history') || localStorage.getItem('poids') || '{}');
-      document.getElementById('weight-input').value = weights[dateKey] || '';
+      let rawWeights = parseStorageJson('minceur_weightLog') || parseStorageJson('weight_history') || parseStorageJson('poids') || [];
+      let weightsObj = {};
+
+      if (Array.isArray(rawWeights)) {
+        rawWeights.forEach(item => { if (item.date && item.weight) weightsObj[item.date] = item.weight; });
+      } else {
+        weightsObj = rawWeights;
+      }
+
+      document.getElementById('weight-input').value = weightsObj[dateKey] || '';
 
       const historyUl = document.getElementById('weight-history');
       historyUl.innerHTML = '';
-      const sortedKeys = Object.keys(weights).sort().reverse();
+      const sortedKeys = Object.keys(weightsObj).sort().reverse();
       
       sortedKeys.forEach(k => {
         const li = document.createElement('li');
         li.className = 'item-row';
-        li.innerHTML = `<span>${k} (Sem. ${getWeekNumber(new Date(k))})</span><strong>${weights[k]} kg</strong>`;
+        li.innerHTML = `<span>${k} (Sem. ${getWeekNumber(new Date(k))})</span><strong>${weightsObj[k]} kg</strong>`;
         historyUl.appendChild(li);
       });
     }
@@ -446,20 +456,17 @@
     function saveWeight() {
       const dateKey = formatDateKey(currentDate);
       const val = parseFloat(document.getElementById('weight-input').value);
-      const weights = JSON.parse(localStorage.getItem('weight_history') || localStorage.getItem('poids') || '{}');
+      let rawWeights = parseStorageJson('minceur_weightLog') || [];
       
-      if (val) {
-        weights[dateKey] = val;
-      } else {
-        delete weights[dateKey];
-      }
-      localStorage.setItem('weight_history', JSON.stringify(weights));
-      localStorage.setItem('poids', JSON.stringify(weights));
+      if (!Array.isArray(rawWeights)) rawWeights = [];
+      rawWeights = rawWeights.filter(w => w.date !== dateKey);
+      if (val) rawWeights.push({ date: dateKey, weight: val });
+
+      localStorage.setItem('minceur_weightLog', JSON.stringify(rawWeights));
       renderWeightView(dateKey);
       alert("Poids enregistré !");
     }
 
-    // --- ONGLET 3 : ACTIVITÉ ---
     function addActivity() {
       const actDate = document.getElementById('activity-date').value;
       const duration = document.getElementById('activity-duration').value;
@@ -470,7 +477,7 @@
         return;
       }
 
-      const activities = JSON.parse(localStorage.getItem('activity_history') || localStorage.getItem('activites') || '[]');
+      let activities = parseStorageJson('minceur_activityLog') || parseStorageJson('activity_history') || [];
       activities.push({
         id: Date.now(),
         date: actDate,
@@ -478,15 +485,14 @@
         steps: steps || 0
       });
 
-      localStorage.setItem('activity_history', JSON.stringify(activities));
-      localStorage.setItem('activites', JSON.stringify(activities));
+      localStorage.setItem('minceur_activityLog', JSON.stringify(activities));
       document.getElementById('activity-duration').value = '';
       document.getElementById('activity-steps').value = '';
       renderActivityList();
     }
 
     function renderActivityList() {
-      const activities = JSON.parse(localStorage.getItem('activity_history') || localStorage.getItem('activites') || '[]');
+      let activities = parseStorageJson('minceur_activityLog') || parseStorageJson('activity_history') || [];
       const ul = document.getElementById('activity-list');
       ul.innerHTML = '';
 
@@ -506,14 +512,12 @@
     }
 
     function deleteActivity(id) {
-      let activities = JSON.parse(localStorage.getItem('activity_history') || localStorage.getItem('activites') || '[]');
+      let activities = parseStorageJson('minceur_activityLog') || parseStorageJson('activity_history') || [];
       activities = activities.filter(a => a.id !== id);
-      localStorage.setItem('activity_history', JSON.stringify(activities));
-      localStorage.setItem('activites', JSON.stringify(activities));
+      localStorage.setItem('minceur_activityLog', JSON.stringify(activities));
       renderActivityList();
     }
 
-    // --- ONGLET 4 : BASE ALIMENTS ---
     function renderFoodDB() {
       const db = getFoodDB();
       const search = document.getElementById('search-food-db').value.toLowerCase();
@@ -559,7 +563,6 @@
       renderFoodDB();
     }
 
-    // --- ONGLET 5 : RÉCAP CALORIES ---
     function populateRecapWeekSelect() {
       const select = document.getElementById('recap-week-select');
       const currentW = getWeekNumber(new Date());
@@ -644,7 +647,6 @@
       container.innerHTML = html;
     }
 
-    // --- NAVIGATION D'ONGLETS ---
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -657,7 +659,6 @@
       }
     }
 
-    // --- EXPORT ET IMPORT SAUVEGARDE ---
     function exporterDonnees() {
       const donnees = JSON.stringify(localStorage);
       const blob = new Blob([donnees], { type: 'application/json' });
@@ -680,7 +681,7 @@
         try {
           const donnees = JSON.parse(e.target.result);
           for (let key in donnees) {
-            localStorage.setItem(key, donnees[key]);
+            localStorage.setItem(key, typeof donnees[key] === 'object' ? JSON.stringify(donnees[key]) : donnees[key]);
           }
           alert('✅ Sauvegarde restaurée avec succès !');
           updateAppView();
