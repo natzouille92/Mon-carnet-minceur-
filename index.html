@@ -4,17 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon Carnet Minceur 🌸</title>
-  <!-- Polices ultra douces et girly -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --primary-pink: #ff1493; /* Rose Fuchsia Vif */
-      --primary-dark: #c71585; /* Fuchsia Sombre */
       --fuchsia-bright: #ff007f;
-      --soft-pink: #fff0f5;
+      --primary-dark: #c71585;
       --card-bg: linear-gradient(145deg, #ffffff, #ffe3ed);
       --card-border: #ffb6c1;
       --text-color: #4a0033;
@@ -34,7 +31,6 @@
       font-size: 15px; 
     }
     
-    /* EN-TÊTE FIXE AVEC BANDEAU FUCHSIA */
     header { 
       background: linear-gradient(180deg, #ffffff 0%, #ffe6f0 100%); 
       padding: 15px 12px; 
@@ -43,34 +39,37 @@
       position: sticky; 
       top: 0; 
       z-index: 100; 
-      box-shadow: 0 6px 20px rgba(255, 20, 147, 0.25); 
+      box-shadow: 0 6px 20px rgba(255, 0, 127, 0.25); 
       border-radius: 0 0 25px 25px;
     }
     
-    /* ENCADRÉ FUCHSIA POUR LE SALUT ET LA MAXIME */
+    /* TOUT PREMIER BLOC VISIBLE DANS L'ENTÊTE */
     .welcome-banner {
-      background: #ffffff;
-      border: 3px solid var(--fuchsia-bright);
+      background: #ffffff !important;
+      border: 3px solid #ff007f !important;
       border-radius: 20px;
-      padding: 12px 15px;
+      padding: 15px !important;
       margin-bottom: 12px;
-      box-shadow: 0 4px 15px rgba(255, 0, 127, 0.2);
+      box-shadow: 0 4px 15px rgba(255, 0, 127, 0.25);
+      display: block !important;
+      visibility: visible !important;
     }
 
     .welcome-title {
-      font-size: 22px;
-      color: var(--fuchsia-bright);
-      font-weight: 700;
-      margin: 0 0 4px 0;
-      text-shadow: 1px 1px 2px rgba(255, 20, 147, 0.15);
+      font-size: 22px !important;
+      color: #ff007f !important;
+      font-weight: 700 !important;
+      margin: 0 0 6px 0 !important;
+      display: block !important;
     }
 
     .welcome-quote {
-      font-size: 14px;
-      color: var(--primary-dark);
-      font-style: italic;
-      font-weight: 700;
-      margin: 0;
+      font-size: 15px !important;
+      color: #c71585 !important;
+      font-style: italic !important;
+      font-weight: 700 !important;
+      margin: 0 !important;
+      display: block !important;
     }
     
     .date-nav { 
@@ -97,7 +96,6 @@
       align-items: center; 
       justify-content: center; 
       font-weight: bold;
-      box-shadow: 0 2px 6px rgba(255, 0, 127, 0.2);
     }
 
     .week-badge { 
@@ -109,14 +107,12 @@
       margin-top: 8px; 
       display: inline-block; 
       font-weight: 700; 
-      box-shadow: 0 3px 10px rgba(199, 21, 133, 0.3); 
     }
 
     .container { padding: 15px; max-width: 650px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* CARTES */
     .card { 
       background: var(--card-bg); 
       border-radius: 22px; 
@@ -152,7 +148,6 @@
       color: var(--text-color); 
       font-weight: 600;
     }
-    input:focus, select:focus { border-color: var(--fuchsia-bright); background: #ffffff; }
     
     .input-flex { flex: 1; min-width: 120px; }
     .input-small { width: 95px; }
@@ -166,7 +161,6 @@
       font-weight: 700; 
       font-size: 16px; 
       cursor: pointer; 
-      box-shadow: 0 4px 12px rgba(199, 21, 133, 0.3); 
     }
 
     .item-list { list-style: none; padding: 0; margin: 0; }
@@ -178,7 +172,6 @@
       border-bottom: 1px solid #ffb6c1; 
       font-size: 15px; 
     }
-    .item-row:last-child { border-bottom: none; }
     .item-actions { display: flex; align-items: center; gap: 10px; }
     
     .qty-edit { 
@@ -189,11 +182,9 @@
       font-weight: 700; 
       cursor: pointer; 
       color: var(--primary-dark); 
-      font-size: 14px; 
     }
     .btn-delete { color: #ff0055; background: none; border: none; cursor: pointer; font-size: 18px; padding: 0 6px; font-weight: bold; }
 
-    /* NAVIGATION BASSE */
     nav.bottom-nav { 
       position: fixed; 
       bottom: 0; 
@@ -204,7 +195,6 @@
       justify-content: space-around; 
       padding: 12px 0 16px 0; 
       border-top: 3px solid var(--card-border); 
-      box-shadow: 0 -4px 20px rgba(255, 20, 147, 0.15); 
       z-index: 1000; 
       border-radius: 20px 20px 0 0;
     }
@@ -226,8 +216,7 @@
 
     .recap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; background: #ffffff; border-radius: 14px; overflow: hidden; }
     .recap-table th, .recap-table td { border: 1px solid var(--card-border); padding: 10px 4px; text-align: center; }
-    .recap-table th { background-color: #ffe3ed; color: var(--primary-dark); font-size: 13px; font-weight: 700; }
-    .recap-total { font-weight: 700; background-color: #ffe3ed; color: var(--primary-dark); }
+    .recap-table th, .recap-total { font-weight: 700; background-color: #ffe3ed; color: var(--primary-dark); }
 
     .chart-container { width: 100%; height: 220px; margin: 10px 0; }
 
@@ -246,13 +235,12 @@
 <body>
 
   <header>
-    <!-- BANDEAU ACCUEIL ROSE FUCHSIA -->
+    <!-- CE BLOC EST OBLIGATOIREMENT VISIBLE EN TOUT PREMIER -->
     <div class="welcome-banner">
       <h1 class="welcome-title">🌸 Bonjour Nathalie 👋 🌸</h1>
       <p class="welcome-quote">✨ « Manger mieux pour vivre mieux » ✨</p>
     </div>
 
-    <!-- NAVIGATION PAR DATE -->
     <div class="date-nav">
       <button onclick="changeDate(-1)">❮</button>
       <span id="current-date-display">...</span>
@@ -263,12 +251,10 @@
 
   <div class="container">
 
-    <!-- ONGLET 1 : REPAS -->
     <div id="tab-repas" class="tab-content active">
       <div id="meals-container"></div>
     </div>
 
-    <!-- ONGLET 2 : POIDS ET COURBE -->
     <div id="tab-poids" class="tab-content">
       <div class="card">
         <div class="card-title">⚖️ Poids du Jour</div>
@@ -289,7 +275,6 @@
       </div>
     </div>
 
-    <!-- ONGLET 3 : MARCHE -->
     <div id="tab-activite" class="tab-content">
       <div class="card">
         <div class="card-title">🚶‍♀️ Saisie de la Marche du Jour</div>
@@ -314,7 +299,6 @@
       </div>
     </div>
 
-    <!-- ONGLET 4 : ALIMENTS -->
     <div id="tab-aliments" class="tab-content">
       <div class="card">
         <div class="card-title">🍎 Ajouter un Aliment au Répertoire</div>
@@ -331,7 +315,6 @@
       </div>
     </div>
 
-    <!-- ONGLET 5 : RÉCAP CALORIES -->
     <div id="tab-recap" class="tab-content">
       <div class="card">
         <div class="card-title">📊 Récapitulatif Calories</div>
@@ -343,7 +326,6 @@
       </div>
     </div>
 
-    <!-- SAUVEGARDE ET RESTAURATION -->
     <div class="backup-box">
       <h3 style="margin-top:0; font-size:16px; color: var(--primary-dark);">Restaurer / Sauvegarder</h3>
       <label class="btn-import">
@@ -380,8 +362,7 @@
   </nav>
 
   <script>
-    // CALAGE DES SEMAINES : SEMAINE 15 COMMENCE LE 27/07/2026
-    const REF_DATE = new Date(2026, 6, 27); // 27 Juillet 2026 = Lundi Semaine 15
+    const REF_DATE = new Date(2026, 6, 27);
     const REF_WEEK = 15;
     let currentDate = new Date();
 
@@ -391,17 +372,12 @@
       const day = date.getDay();
       const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
       const monday = new Date(date.setDate(diffToMonday));
-      
       const diffTime = monday.getTime() - REF_DATE.getTime();
-      const diffWeeks = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000));
-      return REF_WEEK + diffWeeks;
+      return REF_WEEK + Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000));
     }
 
     function formatDateKey(d) {
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
     function formatDateDisplay(d) {
@@ -431,7 +407,6 @@
 
     function getMealData(dateKey) {
       let result = { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
-
       let dailyMeals = safeParse(localStorage.getItem('minceur_dailyMeals')) || safeParse(localStorage.getItem('dailyMeals')) || {};
       dailyMeals = safeParse(dailyMeals);
 
