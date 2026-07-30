@@ -33,10 +33,10 @@
       font-size: 15px; 
     }
     
-    /* HEADER ULTRA GIRLY / FLORAL */
+    /* BANDEAU DE BIENVENUE GIRLY ET FLORAL */
     header { 
       background: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%); 
-      padding: 18px 15px; 
+      padding: 18px 15px 15px 15px; 
       text-align: center; 
       border-bottom: 3px dashed #ff9ebb; 
       position: sticky; 
@@ -46,22 +46,29 @@
       border-radius: 0 0 25px 25px;
     }
     
-    .header-title-box {
+    .welcome-banner {
       background: #ffffff;
-      display: inline-block;
-      padding: 8px 22px;
-      border-radius: 30px;
-      border: 2px solid #fcc2d7;
+      border: 2px dashed #ff75a0;
+      border-radius: 20px;
+      padding: 12px 18px;
+      margin-bottom: 12px;
       box-shadow: 0 4px 12px rgba(255, 117, 160, 0.15);
       position: relative;
     }
 
-    header h1 { 
-      margin: 0; 
-      font-size: 22px; 
-      color: var(--primary-dark); 
-      font-weight: 700; 
-      letter-spacing: 0.5px; 
+    .welcome-title {
+      font-size: 20px;
+      color: var(--primary-dark);
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
+
+    .welcome-quote {
+      font-size: 13px;
+      color: #a06a7b;
+      font-style: italic;
+      font-weight: 600;
+      margin: 0;
     }
     
     .date-nav { 
@@ -69,9 +76,9 @@
       align-items: center; 
       justify-content: center; 
       gap: 15px; 
-      margin-top: 12px; 
+      margin-top: 8px; 
       font-weight: 700; 
-      font-size: 18px; 
+      font-size: 17px; 
       color: var(--primary-dark);
     }
     
@@ -82,8 +89,8 @@
       font-size: 16px; 
       color: var(--primary-dark); 
       cursor: pointer; 
-      width: 38px; 
-      height: 38px; 
+      width: 36px; 
+      height: 36px; 
       display: flex; 
       align-items: center; 
       justify-content: center; 
@@ -94,20 +101,20 @@
     .week-badge { 
       background: linear-gradient(135deg, #ff75a0, #d6336c); 
       color: white; 
-      padding: 6px 20px; 
+      padding: 5px 18px; 
       border-radius: 20px; 
-      font-size: 14px; 
-      margin-top: 10px; 
+      font-size: 13px; 
+      margin-top: 8px; 
       display: inline-block; 
       font-weight: 700; 
-      box-shadow: 0 3px 10px rgba(214, 51, 108, 0.3); 
+      box-shadow: 0 3px 10px rgba(214, 51, 108, 0.25); 
     }
 
     .container { padding: 15px; max-width: 650px; margin: 0 auto; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* CARTES Ultra Douces */
+    /* CARTES */
     .card { 
       background: var(--card-bg); 
       border-radius: 22px; 
@@ -237,15 +244,19 @@
 <body>
 
   <header>
-    <div class="header-title-box">
-      <h1>🌸 Mon Carnet Minceur 🌸</h1>
+    <!-- BANDEAU ACCUEIL FLORAL / GIRLY -->
+    <div class="welcome-banner">
+      <h1 class="welcome-title">🌸 Bonjour Nathalie 👋 🌸</h1>
+      <p class="welcome-quote">✨ « Manger mieux pour vivre mieux » ✨</p>
     </div>
+
+    <!-- NAVIGATION PAR DATE -->
     <div class="date-nav">
       <button onclick="changeDate(-1)">❮</button>
       <span id="current-date-display">...</span>
       <button onclick="changeDate(1)">❯</button>
     </div>
-    <div class="week-badge" id="week-display">Semaine --</div>
+    <div class="week-badge" id="week-display">🌸 Semaine 15 🌸</div>
   </header>
 
   <div class="container">
@@ -367,8 +378,8 @@
   </nav>
 
   <script>
-    // FIXATION DE LA SEMAINE 15 AU LUNDI 27 JUILLET 2026
-    const REF_DATE = new Date(2026, 6, 27); // 27 Juillet 2026
+    // CALAGE DES SEMAINES : SEMAINE 15 COMMENCE LE 27/07/2026
+    const REF_DATE = new Date(2026, 6, 27); // 27 Juillet 2026 = Lundi Semaine 15
     const REF_WEEK = 15;
     let currentDate = new Date();
 
@@ -376,8 +387,10 @@
       const date = new Date(d);
       date.setHours(0,0,0,0);
       const day = date.getDay();
+      // On se recale au lundi précédant ou égal
       const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
       const monday = new Date(date.setDate(diffToMonday));
+      
       const diffTime = monday.getTime() - REF_DATE.getTime();
       const diffWeeks = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000));
       return REF_WEEK + diffWeeks;
