@@ -823,25 +823,20 @@
       circle.style.strokeDashoffset = maxOffset - (maxOffset * pct);
     }
 
-    /* GESTION DE L'ACTIVITÉ ET MARCHE */
+    /* GESTION CORRIGÉE DE L'ACTIVITÉ ET MARCHE */
     function getActivityLog() {
-      let raw = safeParse(localStorage.getItem('minceur_activityLog')) || {};
+      let raw = safeParse(localStorage.getItem('minceur_activityLog')) || safeParse(localStorage.getItem('activityLog')) || {};
       return raw;
     }
 
     function autoCalculateActivity() {
       const steps = parseFloat(document.getElementById('input-steps').value) || 0;
       if (steps > 0) {
-        const dist = (steps * 0.0007).toFixed(1);
         const duration = Math.round(steps / 100);
         const burned = Math.round(steps * 0.04);
 
-        if (!document.getElementById('input-duration').value) {
-          document.getElementById('input-duration').value = duration;
-        }
-        if (!document.getElementById('input-burned').value) {
-          document.getElementById('input-burned').value = burned;
-        }
+        document.getElementById('input-duration').value = duration;
+        document.getElementById('input-burned').value = burned;
       }
     }
 
@@ -849,7 +844,12 @@
       const dateKey = formatDateKey(currentDate);
       const steps = parseInt(document.getElementById('input-steps').value) || 0;
       const duration = parseInt(document.getElementById('input-duration').value) || 0;
-      const burned = parseInt(document.getElementById('input-burned').value) || 0;
+      let burned = parseInt(document.getElementById('input-burned').value);
+      
+      if (isNaN(burned) || burned === 0) {
+        burned = Math.round(steps * 0.04);
+      }
+      
       const distance = (steps * 0.0007).toFixed(1);
 
       let log = getActivityLog();
@@ -862,27 +862,55 @@
 
     function renderActivityView(dateKey) {
       const log = getActivityLog();
-      const today = log[dateKey] || { steps: 0, duration: 0, burned: 0, distance: 0 };
+      const rawObj = log[dateKey];
 
-      document.getElementById('display-steps').innerText = today.steps.toLocaleString();
-      document.getElementById('display-distance').innerText = `${today.distance || 0} km`;
-      document.getElementById('display-duration').innerText = `${today.duration} min`;
-      document.getElementById('display-burned').innerText = `${today.burned} kcal`;
+      let steps = 0, duration = 0, burned = 0, distance = "0.0";
+      
+      if (rawObj) {
+        if (typeof rawObj === 'object') {
+          steps = rawObj.steps || rawObj.pas || 0;
+          duration = rawObj.duration || rawObj.duree || Math.round(steps / 100);
+          burned = rawObj.burned || rawObj.calories || Math.round(steps * 0.04);
+          distance = rawObj.distance || (steps * 0.0007).toFixed(1);
+        } else if (typeof rawObj === 'number') {
+          steps = rawObj;
+          duration = Math.round(steps / 100);
+          burned = Math.round(steps * 0.04);
+          distance = (steps * 0.0007).toFixed(1);
+        }
+      }
 
-      document.getElementById('input-steps').value = today.steps || '';
-      document.getElementById('input-duration').value = today.duration || '';
-      document.getElementById('input-burned').value = today.burned || '';
+      document.getElementById('display-steps').innerText = steps.toLocaleString();
+      document.getElementById('display-distance').innerText = `${distance} km`;
+      document.getElementById('display-duration').innerText = `${duration} min`;
+      document.getElementById('display-burned').innerText = `${burned} kcal`;
+
+      document.getElementById('input-steps').value = steps || '';
+      document.getElementById('input-duration').value = duration || '';
+      document.getElementById('input-burned').value = burned || '';
 
       const historyUl = document.getElementById('activity-history');
       historyUl.innerHTML = '';
       
       const sortedKeys = Object.keys(log).sort((a,b) => b.localeCompare(a));
       sortedKeys.forEach(k => {
-        const act = log[k];
-        if (act.steps > 0) {
+        const item = log[k];
+        let st = 0, dist = 0, cal = 0;
+
+        if (typeof item === 'object') {
+          st = item.steps || item.pas || 0;
+          dist = item.distance || (st * 0.0007).toFixed(1);
+          cal = item.burned || item.calories || Math.round(st * 0.04);
+        } else {
+          st = parseInt(item) || 0;
+          dist = (st * 0.0007).toFixed(1);
+          cal = Math.round(st * 0.04);
+        }
+
+        if (st > 0) {
           const li = document.createElement('li');
           li.className = 'item-row';
-          li.innerHTML = `<span>${k}</span><strong>🚶‍♀️ ${act.steps} pas (${act.distance} km) - 🔥 ${act.burned} kcal</strong>`;
+          li.innerHTML = `<span>${k}</span><strong>🚶‍♀️ ${st} pas (${dist} km) - 🔥 ${cal} kcal</strong>`;
           historyUl.appendChild(li);
         }
       });
