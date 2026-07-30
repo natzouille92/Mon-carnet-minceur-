@@ -17,7 +17,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; }
 
         .container { max-width: 500px; margin: 0 auto; padding: 15px; }
 
@@ -53,18 +53,21 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); border-top: 1px solid #ffe6ed; max-width: 500px; margin: 0 auto; }
+        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); border-top: 1px solid #ffe6ed; max-width: 500px; margin: 0 auto; z-index: 1000; }
         .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; color: var(--text-light); border: none; background: none; cursor: pointer; width: 20%; }
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-icon { font-size: 1.2rem; margin-bottom: 2px; }
 
         .item-list { list-style: none; }
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #fff0f5; font-size: 0.85rem; }
+        .meal-section-title { font-size: 0.85rem; font-weight: bold; color: var(--primary); background: var(--primary-light); padding: 4px 8px; border-radius: 6px; margin-top: 10px; margin-bottom: 4px; }
         .btn-delete { color: #ff5252; background: none; border: none; font-size: 1rem; cursor: pointer; padding: 0 5px; }
 
         .stat-box { text-align: center; padding: 10px; background: #fffafc; border-radius: 10px; border: 1px solid #ffe6ed; }
         .stat-value { font-size: 1.1rem; font-weight: bold; color: var(--primary); }
         .stat-label { font-size: 0.7rem; color: var(--text-light); }
+
+        datalist { display: none; }
     </style>
 </head>
 <body>
@@ -109,7 +112,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <input type="text" id="foodNameInput" placeholder="Rechercher ou entrer un aliment...">
+                <input type="text" id="foodNameInput" list="foodSuggestions" placeholder="Rechercher ou entrer un aliment..." oninput="onFoodSelect()">
+                <datalist id="foodSuggestions"></datalist>
             </div>
             <div class="grid-2">
                 <div class="form-group">
@@ -123,7 +127,7 @@
 
         <div class="card">
             <div class="card-title">📋 Journal de la journée</div>
-            <ul class="item-list" id="mealList"></ul>
+            <div id="mealListContainer"></div>
         </div>
     </div>
 
@@ -198,8 +202,23 @@
     <!-- TAB RÉCAP -->
     <div id="tab-recap" class="tab-content">
         <div class="card">
+            <div class="card-title">📊 Récapitulatif Hebdomadaire</div>
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="stat-box">
+                    <div class="stat-value" id="recapAvgKcal">0</div>
+                    <div class="stat-label">Moyenne Kcal/jour</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="recapTotalBurn">0</div>
+                    <div class="stat-label">Kcal Brûlées (semaine)</div>
+                </div>
+            </div>
+            <div id="recapWeekDetails"></div>
+        </div>
+
+        <div class="card">
             <div class="card-title">⚙️ Sauvegarde & Restauration</div>
-            <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 12px;">Restaurez vos données sauvegardées au format .json ci-dessous :</p>
+            <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 12px;">Téléchargez une sauvegarde ou restaurez votre fichier .json :</p>
             
             <button class="btn btn-secondary" onclick="exportData()" style="margin-bottom: 10px;">⬇️ Exporter une sauvegarde (.json)</button>
             
@@ -211,23 +230,23 @@
 
 <!-- NAVBAR -->
 <div class="navbar">
-    <button class="nav-item active" onclick="switchTab('repas')">
+    <button class="nav-item active" onclick="switchTab('repas', this)">
         <span class="nav-icon">🍽️</span>
         <span>Repas</span>
     </button>
-    <button class="nav-item" onclick="switchTab('poids')">
+    <button class="nav-item" onclick="switchTab('poids', this)">
         <span class="nav-icon">⚖️</span>
         <span>Poids</span>
     </button>
-    <button class="nav-item" onclick="switchTab('activite')">
+    <button class="nav-item" onclick="switchTab('activite', this)">
         <span class="nav-icon">🚶</span>
         <span>Activité</span>
     </button>
-    <button class="nav-item" onclick="switchTab('aliments')">
+    <button class="nav-item" onclick="switchTab('aliments', this)">
         <span class="nav-icon">📖</span>
         <span>Aliments</span>
     </button>
-    <button class="nav-item" onclick="switchTab('recap')">
+    <button class="nav-item" onclick="switchTab('recap', this)">
         <span class="nav-icon">📊</span>
         <span>Récap'</span>
     </button>
@@ -237,15 +256,35 @@
     let currentDate = new Date();
 
     function formatDate(d) {
-        return d.toISOString().split('T')[0];
+        let year = d.getFullYear();
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     function getWeekNumber(d) {
         d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
         d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
         var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-        var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
-        return weekNo;
+        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+    }
+
+    function safeParse(key, defaultValue = []) {
+        try {
+            let item = localStorage.getItem(key);
+            if (!item) return defaultValue;
+            // Correction des antislashs ou double encodage
+            while (typeof item === 'string') {
+                try {
+                    item = JSON.parse(item);
+                } catch(e) {
+                    break;
+                }
+            }
+            return item || defaultValue;
+        } catch (e) {
+            return defaultValue;
+        }
     }
 
     function init() {
@@ -275,27 +314,28 @@
         loadDayData();
     }
 
-    function switchTab(tabName) {
+    function switchTab(tabName, btnEl) {
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         
         document.getElementById('tab-' + tabName).classList.add('active');
-        event.currentTarget.classList.add('active');
+        if(btnEl) btnEl.classList.add('active');
 
         if(tabName === 'activite') loadActivity();
         if(tabName === 'poids') loadWeight();
         if(tabName === 'aliments') loadFoodDb();
+        if(tabName === 'recap') loadRecap();
     }
 
     // --- REPAS ---
     function addMeal() {
-        const name = document.getElementById('foodNameInput').value;
+        const name = document.getElementById('foodNameInput').value.trim();
         const kcal = parseInt(document.getElementById('foodKcalInput').value);
         const type = document.getElementById('mealType').value;
         if (!name || isNaN(kcal)) return;
 
         const dateStr = formatDate(currentDate);
-        let meals = JSON.parse(localStorage.getItem('minceur_meals_' + dateStr) || '[]');
+        let meals = safeParse('minceur_meals_' + dateStr, []);
         meals.push({ name, kcal, type });
         localStorage.setItem('minceur_meals_' + dateStr, JSON.stringify(meals));
 
@@ -306,19 +346,35 @@
 
     function loadDayData() {
         const dateStr = formatDate(currentDate);
-        const meals = JSON.parse(localStorage.getItem('minceur_meals_' + dateStr) || '[]');
-        const listEl = document.getElementById('mealList');
-        listEl.innerHTML = '';
+        const meals = safeParse('minceur_meals_' + dateStr, []);
+        const container = document.getElementById('mealListContainer');
+        container.innerHTML = '';
 
         let total = 0;
-        meals.forEach((m, idx) => {
-            total += m.kcal;
-            listEl.innerHTML += `
-                <li class="item-row">
-                    <div><strong>[${m.type}]</strong> ${m.name}</div>
-                    <div>${m.kcal} kcal <button class="btn-delete" onclick="deleteMeal(${idx})">✕</button></div>
-                </li>`;
+        const categories = ['Petit-Déjeuner', 'Déjeuner', 'Dîner', 'Encas'];
+
+        categories.forEach(cat => {
+            let catMeals = meals.filter(m => m.type === cat);
+            if(catMeals.length > 0) {
+                container.innerHTML += `<div class="meal-section-title">${cat}</div>`;
+                let ul = document.createElement('ul');
+                ul.className = 'item-list';
+                catMeals.forEach((m) => {
+                    total += m.kcal;
+                    let globalIdx = meals.indexOf(m);
+                    ul.innerHTML += `
+                        <li class="item-row">
+                            <div>${m.name}</div>
+                            <div>${m.kcal} kcal <button class="btn-delete" onclick="deleteMeal(${globalIdx})">✕</button></div>
+                        </li>`;
+                });
+                container.appendChild(ul);
+            }
         });
+
+        if(meals.length === 0) {
+            container.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-light); text-align: center; padding: 10px;">Aucun repas enregistré pour ce jour.</p>`;
+        }
 
         const goal = parseInt(document.getElementById('goalInput').value) || 1300;
         document.getElementById('consumedKcal').innerText = total;
@@ -331,17 +387,26 @@
 
     function deleteMeal(idx) {
         const dateStr = formatDate(currentDate);
-        let meals = JSON.parse(localStorage.getItem('minceur_meals_' + dateStr) || '[]');
+        let meals = safeParse('minceur_meals_' + dateStr, []);
         meals.splice(idx, 1);
         localStorage.setItem('minceur_meals_' + dateStr, JSON.stringify(meals));
         loadDayData();
+    }
+
+    function onFoodSelect() {
+        const inputVal = document.getElementById('foodNameInput').value;
+        let db = safeParse('minceur_foodDb', []);
+        let found = db.find(f => f.name.toLowerCase() === inputVal.toLowerCase());
+        if(found) {
+            document.getElementById('foodKcalInput').value = found.kcal;
+        }
     }
 
     // --- POIDS ---
     function saveWeight() {
         const val = parseFloat(document.getElementById('weightInput').value);
         if (isNaN(val)) return;
-        let log = JSON.parse(localStorage.getItem('minceur_weightLog') || '[]');
+        let log = safeParse('minceur_weightLog', []);
         const dateStr = formatDate(currentDate);
         
         log = log.filter(w => w.date !== dateStr);
@@ -354,7 +419,7 @@
     }
 
     function loadWeight() {
-        let log = JSON.parse(localStorage.getItem('minceur_weightLog') || '[]');
+        let log = safeParse('minceur_weightLog', []);
         const listEl = document.getElementById('weightList');
         listEl.innerHTML = '';
         log.forEach((w) => {
@@ -372,16 +437,19 @@
         const data = { pas, dist, kcal };
         
         localStorage.setItem('minceur_act_' + dateStr, JSON.stringify(data));
+        document.getElementById('actPas').value = '';
+        document.getElementById('actDist').value = '';
+        document.getElementById('actKcal').value = '';
         loadActivity();
     }
 
     function loadActivity() {
         const dateStr = formatDate(currentDate);
-        const data = JSON.parse(localStorage.getItem('minceur_act_' + dateStr) || '{"pas":0,"dist":0,"kcal":0}');
+        const data = safeParse('minceur_act_' + dateStr, {pas:0, dist:0, kcal:0});
         
-        document.getElementById('dispPas').innerText = data.pas;
-        document.getElementById('dispDist').innerText = data.dist + ' km';
-        document.getElementById('dispKcal').innerText = data.kcal + ' kcal';
+        document.getElementById('dispPas').innerText = data.pas || 0;
+        document.getElementById('dispDist').innerText = (data.dist || 0) + ' km';
+        document.getElementById('dispKcal').innerText = (data.kcal || 0) + ' kcal';
 
         const listEl = document.getElementById('activityList');
         listEl.innerHTML = '';
@@ -390,11 +458,11 @@
             let key = localStorage.key(i);
             if (key.startsWith('minceur_act_')) {
                 let dStr = key.replace('minceur_act_', '');
-                let item = JSON.parse(localStorage.getItem(key));
+                let item = safeParse(key, {});
                 listEl.innerHTML += `
                     <li class="item-row">
                         <div><strong>${dStr}</strong></div>
-                        <div>🚶 ${item.pas} pas (${item.dist} km) - 🔥 ${item.kcal} kcal</div>
+                        <div>🚶 ${item.pas || 0} pas (${item.dist || 0} km) - 🔥 ${item.kcal || 0} kcal</div>
                     </li>`;
             }
         }
@@ -402,11 +470,11 @@
 
     // --- ALIMENTS ---
     function addFoodToDb() {
-        const name = document.getElementById('dbName').value;
+        const name = document.getElementById('dbName').value.trim();
         const kcal = parseInt(document.getElementById('dbKcal').value);
         if(!name || isNaN(kcal)) return;
 
-        let db = JSON.parse(localStorage.getItem('minceur_foodDb') || '[]');
+        let db = safeParse('minceur_foodDb', []);
         db.push({ name, kcal });
         localStorage.setItem('minceur_foodDb', JSON.stringify(db));
 
@@ -416,26 +484,67 @@
     }
 
     function loadFoodDb() {
-        let db = JSON.parse(localStorage.getItem('minceur_foodDb') || '[]');
+        let db = safeParse('minceur_foodDb', []);
         const listEl = document.getElementById('customFoodList');
+        const dataList = document.getElementById('foodSuggestions');
         listEl.innerHTML = '';
+        dataList.innerHTML = '';
+
         db.forEach((f, idx) => {
             listEl.innerHTML += `
                 <li class="item-row">
                     <div>${f.name}</div>
                     <div>${f.kcal} kcal <button class="btn-delete" onclick="deleteFoodDb(${idx})">✕</button></div>
                 </li>`;
+            dataList.innerHTML += `<option value="${f.name}">`;
         });
     }
 
     function deleteFoodDb(idx) {
-        let db = JSON.parse(localStorage.getItem('minceur_foodDb') || '[]');
+        let db = safeParse('minceur_foodDb', []);
         db.splice(idx, 1);
         localStorage.setItem('minceur_foodDb', JSON.stringify(db));
         loadFoodDb();
     }
 
-    // --- IMPORT / EXPORT (FORCAGE DE RECHARGEMENT) ---
+    // --- RÉCAPITULATIF HEBDOMADAIRE ---
+    function loadRecap() {
+        let totalKcalWeek = 0;
+        let daysWithData = 0;
+        let totalBurn = 0;
+        let detailsHtml = '<ul class="item-list">';
+
+        for(let i = 0; i < 7; i++) {
+            let tempDate = new Date(currentDate);
+            tempDate.setDate(tempDate.getDate() - tempDate.getDay() + 1 + i); // Lundi à Dimanche
+            let dStr = formatDate(tempDate);
+
+            let meals = safeParse('minceur_meals_' + dStr, []);
+            let dayKcal = meals.reduce((acc, m) => acc + (m.kcal || 0), 0);
+            
+            let act = safeParse('minceur_act_' + dStr, {kcal:0});
+            totalBurn += (act.kcal || 0);
+
+            if(dayKcal > 0) {
+                totalKcalWeek += dayKcal;
+                daysWithData++;
+            }
+
+            detailsHtml += `
+                <li class="item-row">
+                    <div>${tempDate.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric'})}</div>
+                    <div><strong>${dayKcal} kcal</strong> consumed</div>
+                </li>`;
+        }
+        detailsHtml += '</ul>';
+
+        let avg = daysWithData > 0 ? Math.round(totalKcalWeek / daysWithData) : 0;
+        document.getElementById('recapAvgKcal').innerText = avg;
+        document.getElementById('recapTotalBurn').innerText = totalBurn;
+        document.getElementById('recapWeekDetails').innerHTML = detailsHtml;
+    }
+
+    // --- IMPORT / EXPORT AVEC NETTOYAGE ---
     function exportData() {
         let data = {};
         for (let i = 0; i < localStorage.length; i++) {
@@ -458,8 +567,14 @@
         let reader = new FileReader();
         reader.onload = function(e) {
             try {
-                let data = JSON.parse(e.target.result);
-                // Si les données sont encapsulées dans des chaînes JSON, on restaure directement
+                let rawText = e.target.result;
+                let data = JSON.parse(rawText);
+
+                // Effacement des anciennes clés minceur pour repartir sur du propre
+                Object.keys(localStorage).forEach(k => {
+                    if(k.startsWith('minceur_')) localStorage.removeItem(k);
+                });
+
                 Object.keys(data).forEach(key => {
                     let val = data[key];
                     if (typeof val === 'object') {
@@ -468,8 +583,9 @@
                         localStorage.setItem(key, val);
                     }
                 });
-                alert('Restauration réussie ! La page va se recharger.');
-                window.location.reload(); // Recharge la page automatiquement pour appliquer les données
+
+                alert('Restauration terminée avec succès ! La page va se recharger.');
+                window.location.reload();
             } catch (err) {
                 alert('Erreur lors de la lecture du fichier : ' + err.message);
             }
