@@ -67,7 +67,6 @@
       margin: 0 !important;
     }
 
-    /* GAUGE STYLES */
     .calorie-gauge-container {
       display: flex;
       align-items: center;
@@ -207,7 +206,18 @@
       cursor: pointer; 
     }
 
-    /* AUTOCOMPLETE DROPDOWN */
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--fuchsia-bright);
+      border: 2px solid var(--fuchsia-bright);
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+    }
+
     .autocomplete-results {
       position: absolute;
       top: 100%;
@@ -286,7 +296,6 @@
     .nav-item.active { color: var(--fuchsia-bright); }
     .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
 
-    /* MODAL POPUP */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -315,7 +324,7 @@
       <p class="welcome-quote">✨ « Manger mieux pour vivre mieux » ✨</p>
     </div>
 
-    <!-- CERCLE DE JAUGE DE CALORIES -->
+    <!-- JAUGE DE CALORIES -->
     <div class="calorie-gauge-container">
       <svg class="gauge-svg" viewBox="0 0 100 100">
         <circle class="gauge-bg" cx="50" cy="50" r="40" />
@@ -371,6 +380,24 @@
       </div>
     </div>
 
+    <!-- ONGLET RÉCAPITULATIF DES CALORIES ET SAUVEGARDE -->
+    <div id="tab-recap" class="tab-content">
+      <div class="card">
+        <div class="card-title">📊 Récapitulatif de la Journée</div>
+        <ul class="item-list" id="recap-breakdown">
+          <!-- Rempli en JS -->
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">💾 Sauvegarde & Restauration</div>
+        <p style="font-size:13px; color:#666; margin-bottom:12px;">Conservez une copie de vos repas et pesées sur votre téléphone.</p>
+        <button class="btn-add" style="width:100%; margin-bottom:10px;" onclick="exportData()">📥 Sauvegarder mes données</button>
+        <button class="btn-secondary" onclick="triggerImport()">📤 Importer des données</button>
+        <input type="file" id="import-file-input" style="display:none;" onchange="importData(event)">
+      </div>
+    </div>
+
   </div>
 
   <!-- POPUP NOUVEL ALIMENT AUTOMATIQUE -->
@@ -400,6 +427,10 @@
     <button class="nav-item" onclick="switchTab('aliments', event)">
       <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
       Aliments
+    </button>
+    <button class="nav-item" onclick="switchTab('recap', event)">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      Récap'
     </button>
   </nav>
 
@@ -433,8 +464,8 @@
     }
 
     function safeParse(val) {
-      if (typeof val !== 'string') return val;
-      try { return JSON.parse(val); } catch(e) { return val; }
+      if (!val || val === "undefined") return null;
+      try { return JSON.parse(val); } catch(e) { return null; }
     }
 
     function getFoodDB() {
@@ -481,6 +512,7 @@
       renderWeightView(dateKey);
       renderFoodDB();
       updateGauge();
+      renderRecapView(dateKey);
     }
 
     function renderMealsView(dateKey) {
@@ -500,7 +532,7 @@
             <span>${mealKcal} kcal</span>
           </div>
           <div class="input-group">
-            <input type="text" id="input-food-${meal}" class="input-flex" placeholder="Nom de l'aliment (min. 2 lettres)" oninput="handleFoodInput('${meal}')" autocomplete="off">
+            <input type="text" id="input-food-${meal}" class="input-flex" placeholder="Nom de l'aliment" oninput="handleFoodInput('${meal}')" autocomplete="off">
             <div id="autocomplete-${meal}" class="autocomplete-results"></div>
             <input type="number" id="input-qty-${meal}" class="input-small" placeholder="Grammes">
             <button class="btn-add" onclick="addFoodToMeal('${meal}')">+</button>
@@ -526,7 +558,6 @@
       });
     }
 
-    /* AUTOCOMPLÉTION DÈS 2 LETTRES */
     function handleFoodInput(meal) {
       const input = document.getElementById(`input-food-${meal}`);
       const val = input.value.trim().toLowerCase();
@@ -538,7 +569,7 @@
       }
 
       const db = getFoodDB();
-      const matches = db.filter(f => f.name.toLowerCase().includes(val));
+      const matches = db.filter(f => f.name && f.name.toLowerCase().includes(val));
 
       if (matches.length === 0) {
         resultsContainer.style.display = 'none';
@@ -546,7 +577,7 @@
       }
 
       resultsContainer.innerHTML = matches.map(f => `
-        <div class="autocomplete-item" onclick="selectAutocomplete('${meal}', '${f.name}')">
+        <div class="autocomplete-item" onclick="selectAutocomplete('${meal}', '${f.name.replace(/'/g, "\\'")}')">
           ${f.name} <small style="color:#c71585">(${f.kcal} kcal/100g)</small>
         </div>
       `).join('');
@@ -560,18 +591,20 @@
 
     function addFoodToMeal(meal) {
       const dateKey = formatDateKey(currentDate);
-      const foodName = document.getElementById(`input-food-${meal}`).value.trim();
-      const qty = parseFloat(document.getElementById(`input-qty-${meal}`).value);
+      const foodInput = document.getElementById(`input-food-${meal}`);
+      const foodName = foodInput.value.trim();
+      const qtyInput = document.getElementById(`input-qty-${meal}`);
+      const qty = parseFloat(qtyInput.value);
 
-      if (!foodName || !qty) {
+      if (!foodName || isNaN(qty) || qty <= 0) {
         alert("Veuillez saisir un aliment et sa quantité en grammes.");
         return;
       }
 
       const db = getFoodDB();
-      const foodObj = db.find(f => f.name.toLowerCase() === foodName.toLowerCase());
+      const foodObj = db.find(f => f.name && f.name.toLowerCase() === foodName.toLowerCase());
 
-      /* SI L'ALIMENT N'EXISTE PAS -> OVERLAY POPUP AUTOMATIQUE */
+      /* OUVERTURE DU POPUP SI INCONNU */
       if (!foodObj) {
         currentPendingMeal = { meal, name: foodName, qty };
         document.getElementById('modal-food-name-display').innerText = foodName;
@@ -585,13 +618,12 @@
       mealsData[meal].push({ name: foodObj.name, grams: qty, kcalTotal: kcalTotal, kcalPer100: foodObj.kcal });
       
       saveMealData(dateKey, mealsData);
-      renderMealsView(dateKey);
-      updateGauge();
+      updateAppView();
     }
 
     function confirmModalFood() {
       const kcalPer100 = parseFloat(document.getElementById('modal-food-kcal').value);
-      if (!kcalPer100) return alert("Veuillez saisir les calories pour 100g.");
+      if (isNaN(kcalPer100) || kcalPer100 <= 0) return alert("Veuillez saisir les calories pour 100g.");
 
       const db = getFoodDB();
       db.push({ name: currentPendingMeal.name, kcal: kcalPer100 });
@@ -600,8 +632,13 @@
       closeModal();
       renderFoodDB();
 
-      // Poursuivre l'ajout au repas
-      addFoodToMeal(currentPendingMeal.meal);
+      const dateKey = formatDateKey(currentDate);
+      const kcalTotal = Math.round((kcalPer100 * currentPendingMeal.qty) / 100);
+      const mealsData = getMealData(dateKey);
+      mealsData[currentPendingMeal.meal].push({ name: currentPendingMeal.name, grams: currentPendingMeal.qty, kcalTotal: kcalTotal, kcalPer100: kcalPer100 });
+      
+      saveMealData(dateKey, mealsData);
+      updateAppView();
     }
 
     function closeModal() {
@@ -621,8 +658,7 @@
         item.grams = newQty;
         item.kcalTotal = Math.round((kcalPer100 * newQty) / 100);
         saveMealData(dateKey, mealsData);
-        renderMealsView(dateKey);
-        updateGauge();
+        updateAppView();
       }
     }
 
@@ -631,11 +667,9 @@
       const mealsData = getMealData(dateKey);
       mealsData[meal].splice(idx, 1);
       saveMealData(dateKey, mealsData);
-      renderMealsView(dateKey);
-      updateGauge();
+      updateAppView();
     }
 
-    /* GAUGE DE CALORIES DYNAMIQUE */
     function updateGauge() {
       const dateKey = formatDateKey(currentDate);
       const mealsData = getMealData(dateKey);
@@ -657,6 +691,38 @@
       const maxOffset = 251.2;
       const pct = Math.min(1, consumed / target);
       circle.style.strokeDashoffset = maxOffset - (maxOffset * pct);
+    }
+
+    /* AFFICHAGE DE DU RÉCAPITULATIF DES CALORIES */
+    function renderRecapView(dateKey) {
+      const mealsData = getMealData(dateKey);
+      const ul = document.getElementById('recap-breakdown');
+      ul.innerHTML = '';
+
+      let totalDay = 0;
+
+      MEAL_TYPES.forEach(m => {
+        const items = mealsData[m] || [];
+        const mealTotal = items.reduce((sum, item) => sum + (item.kcalTotal || item.kcal || 0), 0);
+        totalDay += mealTotal;
+
+        const li = document.createElement('li');
+        li.className = 'item-row';
+        li.innerHTML = `<span>${m}</span><strong>${mealTotal} kcal</strong>`;
+        ul.appendChild(li);
+      });
+
+      const target = parseFloat(document.getElementById('target-kcal-input').value) || 1600;
+      const summaryLi = document.createElement('li');
+      summaryLi.className = 'item-row';
+      summaryLi.style.borderTop = '2px solid var(--fuchsia-bright)';
+      summaryLi.style.marginTop = '10px';
+      summaryLi.style.paddingTop = '10px';
+      summaryLi.innerHTML = `
+        <span><strong>Total Consommé</strong></span>
+        <strong style="color:var(--fuchsia-bright); font-size:16px;">${totalDay} / ${target} kcal</strong>
+      `;
+      ul.appendChild(summaryLi);
     }
 
     function getParsedWeights() {
@@ -698,7 +764,7 @@
       const ul = document.getElementById('food-db-list');
       ul.innerHTML = '';
 
-      db.filter(f => f.name.toLowerCase().includes(search))
+      db.filter(f => f.name && f.name.toLowerCase().includes(search))
         .sort((a,b) => a.name.localeCompare(b.name))
         .forEach((f) => {
           const li = document.createElement('li');
@@ -707,7 +773,7 @@
             <span><strong>${f.name}</strong></span>
             <div class="item-actions">
               <span>${f.kcal} kcal/100g</span>
-              <button class="btn-delete" onclick="deleteCustomFood('${f.name}')">✕</button>
+              <button class="btn-delete" onclick="deleteCustomFood('${f.name.replace(/'/g, "\\'")}')">✕</button>
             </div>
           `;
           ul.appendChild(li);
@@ -717,18 +783,57 @@
     function addCustomFood() {
       const name = document.getElementById('new-food-name').value.trim();
       const kcal = parseFloat(document.getElementById('new-food-kcal').value);
-      if (!name || !kcal) return alert("Entrez un nom et le nombre de calories.");
+      if (!name || isNaN(kcal)) return alert("Entrez un nom et le nombre de calories.");
       
       const db = getFoodDB();
       db.push({ name: name, kcal: kcal });
       saveFoodDB(db);
       renderFoodDB();
+      document.getElementById('new-food-name').value = '';
+      document.getElementById('new-food-kcal').value = '';
     }
 
     function deleteCustomFood(name) {
       let db = getFoodDB().filter(f => f.name !== name);
       saveFoodDB(db);
       renderFoodDB();
+    }
+
+    function exportData() {
+      const data = {
+        foodDb: getFoodDB(),
+        dailyMeals: safeParse(localStorage.getItem('minceur_dailyMeals')) || {},
+        weightLog: getParsedWeights()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `sauvegarde_carnet_minceur_${formatDateKey(new Date())}.json`;
+      a.click();
+    }
+
+    function triggerImport() {
+      document.getElementById('import-file-input').click();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.foodDb) localStorage.setItem('minceur_foodDb', JSON.stringify(data.foodDb));
+          if (data.dailyMeals) localStorage.setItem('minceur_dailyMeals', JSON.stringify(data.dailyMeals));
+          if (data.weightLog) localStorage.setItem('minceur_weightLog', JSON.stringify(data.weightLog));
+          alert("Données importées avec succès !");
+          updateAppView();
+        } catch(err) {
+          alert("Fichier de sauvegarde invalide.");
+        }
+      };
+      reader.readAsText(file);
     }
 
     function switchTab(tabId, evt) {
