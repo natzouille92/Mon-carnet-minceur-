@@ -1,1413 +1,679 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mon Carnet Minceur 🌸</title>
-    <!-- Google Fonts & FontAwesome Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Carnet Minceur</title>
+  <style>
+    :root {
+      --primary: #e8637a;
+      --primary-light: #fdf2f4;
+      --secondary: #4a5568;
+      --bg: #fff5f7;
+      --card-bg: #ffffff;
+      --text: #2d3748;
+      --accent-blue: #3182ce;
+      --accent-green: #38a169;
+    }
+
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); margin: 0; padding-bottom: 90px; color: var(--text); }
     
-    <style>
-        :root {
-            --bg-color: #FFF5F7;
-            --card-bg: #FFFFFF;
-            --primary: #E88D9B;
-            --primary-dark: #D46A7B;
-            --primary-light: #FFEFF2;
-            --accent-gold: #D4AF37;
-            --text-main: #4A3E3D;
-            --text-muted: #8C7A7B;
-            --rose-gold: #B87333;
-            --border-radius: 20px;
-            --shadow: 0 8px 25px rgba(232, 141, 155, 0.15);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding-bottom: 90px;
-            max-width: 480px;
-            margin: 0 auto;
-            min-height: 100vh;
-            position: relative;
-            background-image: radial-gradient(#F3C6CF 0.8px, transparent 0.8px);
-            background-size: 16px 16px;
-        }
-
-        /* Safe top for iPhone notch */
-        header {
-            background: linear-gradient(135deg, #FFF0F3 0%, #FCE4EC 100%);
-            padding: 25px 20px 20px;
-            border-bottom-left-radius: 30px;
-            border-bottom-right-radius: 30px;
-            box-shadow: 0 4px 15px rgba(232, 141, 155, 0.12);
-            position: relative;
-            border: 1px solid rgba(232, 141, 155, 0.2);
-        }
-
-        .header-greeting {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-title {
-            font-family: 'Caveat', cursive;
-            font-size: 2.2rem;
-            color: var(--primary-dark);
-            line-height: 1.1;
-        }
-
-        .header-date-badge {
-            background: #FFF;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary-dark);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid var(--primary-light);
-        }
-
-        .quote-box {
-            margin-top: 10px;
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            text-align: center;
-            letter-spacing: 0.3px;
-        }
-
-        /* Navigation Bar Bottom */
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 480px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 5px 15px;
-            border-top-left-radius: 25px;
-            border-top-right-radius: 25px;
-            box-shadow: 0 -5px 20px rgba(232, 141, 155, 0.15);
-            z-index: 100;
-            border-top: 1px solid #FFE4E8;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            width: 20%;
-        }
-
-        .nav-btn i {
-            font-size: 1.25rem;
-            margin-bottom: 4px;
-            transition: transform 0.2s;
-        }
-
-        .nav-btn.active {
-            color: var(--primary-dark);
-        }
-
-        .nav-btn.active i {
-            transform: translateY(-2px) scale(1.15);
-        }
-
-        /* Tab Contents */
-        .tab-content {
-            display: none;
-            padding: 20px 16px;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Cards Styling */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(255, 228, 232, 0.6);
-            position: relative;
-        }
-
-        .card-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.15rem;
-            color: var(--primary-dark);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1.5px dashed #FFE0E6;
-            padding-bottom: 8px;
-        }
-
-        /* Donut Chart Container */
-        .donut-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            padding: 10px 0;
-        }
-
-        .donut-chart {
-            position: relative;
-            width: 170px;
-            height: 170px;
-        }
-
-        .donut-chart svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-
-        .donut-chart circle {
-            fill: none;
-            stroke-width: 12;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.6s ease;
-        }
-
-        .donut-bg {
-            stroke: #FFE5EC;
-        }
-
-        .donut-fill {
-            stroke: var(--primary);
-            stroke-dasharray: 440;
-            stroke-dashoffset: 440;
-        }
-
-        .donut-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        .donut-number {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-            line-height: 1;
-        }
-
-        .donut-label {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Date Navigation Bar */
-        .date-picker-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #FFF;
-            padding: 10px 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-        }
-
-        .date-btn {
-            background: var(--primary-light);
-            border: none;
-            color: var(--primary-dark);
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .current-date-display {
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 0.95rem;
-        }
-
-        /* Meals Accordion / Sections */
-        .meal-section {
-            background: #FFF;
-            border-radius: 16px;
-            margin-bottom: 15px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(232, 141, 155, 0.08);
-            border: 1px solid #FFF0F3;
-        }
-
-        .meal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .meal-title {
-            font-weight: 700;
-            color: var(--primary-dark);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .meal-calories {
-            font-size: 0.85rem;
-            font-weight: 600;
-            background: var(--primary-light);
-            color: var(--primary-dark);
-            padding: 4px 10px;
-            border-radius: 12px;
-        }
-
-        .food-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-        }
-
-        .food-table th {
-            text-align: left;
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            padding-bottom: 6px;
-            border-bottom: 1px solid #FFE4E8;
-        }
-
-        .food-table td {
-            padding: 8px 0;
-            font-size: 0.85rem;
-            border-bottom: 1px dashed #FFF0F3;
-        }
-
-        .btn-delete-row {
-            color: #FF7B7B;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.85rem;
-            padding: 2px 6px;
-        }
-
-        /* Form Inputs */
-        .add-food-form {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-            position: relative;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid #FFE0E6;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            outline: none;
-            transition: border 0.2s;
-            background: #FFFCFD;
-        }
-
-        .form-input:focus {
-            border-color: var(--primary);
-            background: #FFF;
-        }
-
-        .btn-add {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.85rem;
-            box-shadow: 0 3px 10px rgba(212, 106, 123, 0.3);
-            white-space: nowrap;
-        }
-
-        /* Autocomplete dropdown */
-        .autocomplete-list {
-            position: absolute;
-            top: 42px;
-            left: 0;
-            right: 0;
-            background: #FFF;
-            border: 1px solid #FFE0E6;
-            border-radius: 12px;
-            max-height: 160px;
-            overflow-y: auto;
-            z-index: 50;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            display: none;
-        }
-
-        .autocomplete-item {
-            padding: 10px 14px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #FFF5F7;
-        }
-
-        .autocomplete-item:hover {
-            background: var(--primary-light);
-            color: var(--primary-dark);
-        }
-
-        /* Weight Tracking Styles */
-        .weight-hero {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(135deg, #FFF0F3 0%, #FFE5EC 100%);
-            padding: 15px;
-            border-radius: 16px;
-            margin-bottom: 15px;
-        }
-
-        .weight-stat {
-            text-align: center;
-        }
-
-        .weight-num {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--primary-dark);
-        }
-
-        .weight-lbl {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-        }
-
-        .smiley-box {
-            font-size: 2.2rem;
-            text-align: center;
-            animation: bounce 2s infinite ease-in-out;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        /* Activity Card */
-        .activity-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .act-box {
-            background: #FFF;
-            padding: 12px 8px;
-            border-radius: 16px;
-            text-align: center;
-            border: 1px solid #FFE4E8;
-            box-shadow: 0 3px 10px rgba(232, 141, 155, 0.06);
-        }
-
-        .act-box i {
-            font-size: 1.3rem;
-            color: var(--primary);
-            margin-bottom: 6px;
-        }
-
-        .act-val {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--text-main);
-        }
-
-        .act-lbl {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-        }
-
-        /* Celebrations Wall / Badges */
-        .badges-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .badge-card {
-            background: #FFF;
-            border-radius: 16px;
-            padding: 14px;
-            text-align: center;
-            border: 1px solid #FFE4E8;
-            position: relative;
-            opacity: 0.5;
-            filter: grayscale(80%);
-            transition: all 0.3s;
-        }
-
-        .badge-card.unlocked {
-            opacity: 1;
-            filter: grayscale(0%);
-            border-color: #FFD700;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
-            background: linear-gradient(180deg, #FFFFFF 0%, #FFFDF5 100%);
-        }
-
-        .badge-icon {
-            font-size: 2rem;
-            margin-bottom: 6px;
-            display: inline-block;
-        }
-
-        .badge-title {
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 3px;
-        }
-
-        .badge-desc {
-            font-size: 0.68rem;
-            color: var(--text-muted);
-        }
-
-        .badge-status {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            font-size: 0.7rem;
-            color: #4CAF50;
-        }
-
-        /* Custom SVG Chart */
-        .chart-container {
-            width: 100%;
-            height: 160px;
-            margin-top: 15px;
-        }
-
-        .chart-container svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        .chart-line {
-            fill: none;
-            stroke: var(--primary-dark);
-            stroke-width: 3;
-            stroke-linecap: round;
-        }
-
-        .chart-area {
-            fill: url(#pinkGradient);
-            opacity: 0.3;
-        }
-
-        .chart-point {
-            fill: var(--primary-dark);
-            stroke: #FFF;
-            stroke-width: 2;
-            r: 5;
-        }
-
-        /* Database items list */
-        .db-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #FFE4E8;
-            font-size: 0.85rem;
-        }
-
-        .modal-bg {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.4);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-card {
-            background: #FFF;
-            width: 100%;
-            max-width: 400px;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-    </style>
+    header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #f0d8df; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+    header h1 { margin: 0; font-size: 18px; color: var(--primary); font-weight: 700; }
+    .date-nav { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 8px; font-weight: 600; }
+    .date-nav button { background: none; border: none; font-size: 18px; color: var(--primary); cursor: pointer; }
+    .week-badge { background: var(--primary-light); color: var(--primary); padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-top: 4px; display: inline-block; font-weight: bold; }
+
+    .container { padding: 15px; max-width: 600px; margin: 0 auto; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border: 1px solid #f7e6eb; }
+    .card-title { display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: var(--primary); margin-bottom: 10px; font-size: 16px; border-bottom: 1px dashed #f0d8df; padding-bottom: 8px; }
+
+    /* Forms & Inputs */
+    .input-group { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    input, select { padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
+    input:focus { border-color: var(--primary); }
+    .input-flex { flex: 1; min-width: 120px; }
+    .input-small { width: 75px; }
+    button.btn-add { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    button.btn-add:hover { opacity: 0.9; }
+
+    /* Lists */
+    .item-list { list-style: none; padding: 0; margin: 0; }
+    .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #edf2f7; font-size: 14px; }
+    .item-row:last-child { border-bottom: none; }
+    .item-actions { display: flex; align-items: center; gap: 8px; }
+    .qty-edit { background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 4px; padding: 2px 6px; font-weight: bold; cursor: pointer; color: var(--secondary); }
+    .btn-delete { color: #e53e3e; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 4px; }
+
+    /* Quick Create Food Modal / Box */
+    .quick-create-food { background: #fffaf0; border: 1px solid #feebc8; padding: 10px; border-radius: 8px; margin-top: 8px; display: none; }
+    .quick-create-food p { margin: 0 0 6px 0; font-size: 12px; color: #dd6b20; font-weight: bold; }
+
+    /* Bottom Navigation */
+    nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #f0d8df; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; background: none; border: none; color: #a0aec0; font-size: 11px; cursor: pointer; gap: 3px; }
+    .nav-item.active { color: var(--primary); font-weight: bold; }
+    .nav-item svg { width: 20px; height: 20px; fill: currentColor; }
+
+    /* Tables for Recap */
+    .recap-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    .recap-table th, .recap-table td { border: 1px solid #edf2f7; padding: 8px; text-align: center; }
+    .recap-table th { background-color: var(--primary-light); color: var(--primary); }
+    .recap-total { font-weight: bold; background-color: #f7fafc; }
+
+    /* Backup Box */
+    .backup-box { margin-top: 25px; padding: 15px; border: 1px solid #e2e8f0; border-radius: 12px; background: white; text-align: center; }
+    .btn-export { background: var(--accent-green); color: white; padding: 8px 14px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-import { background: var(--accent-blue); color: white; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-block; }
+  </style>
 </head>
 <body>
 
-    <!-- Header Section -->
-    <header>
-        <div class="header-greeting">
-            <div>
-                <h1 class="header-title">Bonjour Nathalie 🌸</h1>
-            </div>
-            <div class="header-date-badge" id="headerDate">Aujourd'hui</div>
-        </div>
-        <div class="quote-box">« Manger mieux pour vivre mieux »</div>
-    </header>
+  <header>
+    <h1 id="app-title">Mon Carnet Minceur</h1>
+    <div class="date-nav">
+      <button onclick="changeDate(-1)">❮</button>
+      <span id="current-date-display">...</span>
+      <button onclick="changeDate(1)">❯</button>
+    </div>
+    <div class="week-badge" id="week-display">Semaine --</div>
+  </header>
 
-    <!-- TAB 1: CALORIES & REPAS (CARNET) -->
-    <div id="tab-calories" class="tab-content active">
-        
-        <!-- Date Selector -->
-        <div class="date-picker-bar">
-            <button class="date-btn" onclick="changeDate(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-            <div class="current-date-display" id="displaySelectedDate">Aujourd'hui</div>
-            <button class="date-btn" onclick="changeDate(1)"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
+  <div class="container">
 
-        <!-- Donut Progress Card -->
-        <div class="card">
-            <div class="card-title">
-                <i class="fa-solid fa-chart-pie"></i> Objectif du jour : 1300 kcal
-            </div>
-            <div class="donut-wrapper">
-                <div class="donut-chart">
-                    <svg viewBox="0 0 160 160">
-                        <circle class="donut-bg" cx="80" cy="80" r="70"></circle>
-                        <circle class="donut-fill" id="donutProgress" cx="80" cy="80" r="70"></circle>
-                    </svg>
-                    <div class="donut-text">
-                        <div class="donut-number" id="caloriesRemaining">1300</div>
-                        <div class="donut-label">kcal restantes</div>
-                    </div>
-                </div>
-                <div style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-                    Consommées : <strong id="caloriesConsumed" style="color: var(--primary-dark);">0</strong> / 1300 kcal
-                </div>
-            </div>
-        </div>
-
-        <!-- Meals Sections -->
-        <div id="mealsContainer">
-            <!-- Breakfast -->
-            <div class="meal-section" data-meal="Petit-déjeuner">
-                <div class="meal-header">
-                    <div class="meal-title"><i class="fa-solid fa-mug-hot" style="color:#E88D9B;"></i> Petit-déjeuner</div>
-                    <div class="meal-calories"><span class="meal-total">0</span> kcal</div>
-                </div>
-                <table class="food-table">
-                    <thead>
-                        <tr>
-                            <th>Aliment</th>
-                            <th style="width: 50px;">g</th>
-                            <th style="width: 50px;">kcal</th>
-                            <th style="width: 25px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="meal-rows"></tbody>
-                </table>
-                <div class="add-food-form">
-                    <div class="input-group">
-                        <input type="text" class="form-input food-input" placeholder="Chercher un aliment..." onkeyup="handleAutocomplete(this)">
-                        <input type="number" class="form-input grams-input" placeholder="Grammes" style="width: 90px;">
-                        <button class="btn-add" onclick="addFoodToMeal(this, 'Petit-déjeuner')"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                    <div class="autocomplete-list"></div>
-                </div>
-            </div>
-
-            <!-- Lunch -->
-            <div class="meal-section" data-meal="Déjeuner">
-                <div class="meal-header">
-                    <div class="meal-title"><i class="fa-solid fa-utensils" style="color:#E88D9B;"></i> Déjeuner</div>
-                    <div class="meal-calories"><span class="meal-total">0</span> kcal</div>
-                </div>
-                <table class="food-table">
-                    <thead>
-                        <tr>
-                            <th>Aliment</th>
-                            <th style="width: 50px;">g</th>
-                            <th style="width: 50px;">kcal</th>
-                            <th style="width: 25px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="meal-rows"></tbody>
-                </table>
-                <div class="add-food-form">
-                    <div class="input-group">
-                        <input type="text" class="form-input food-input" placeholder="Chercher un aliment..." onkeyup="handleAutocomplete(this)">
-                        <input type="number" class="form-input grams-input" placeholder="Grammes" style="width: 90px;">
-                        <button class="btn-add" onclick="addFoodToMeal(this, 'Déjeuner')"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                    <div class="autocomplete-list"></div>
-                </div>
-            </div>
-
-            <!-- Snack -->
-            <div class="meal-section" data-meal="Collation">
-                <div class="meal-header">
-                    <div class="meal-title"><i class="fa-solid fa-apple-whole" style="color:#E88D9B;"></i> Collation</div>
-                    <div class="meal-calories"><span class="meal-total">0</span> kcal</div>
-                </div>
-                <table class="food-table">
-                    <thead>
-                        <tr>
-                            <th>Aliment</th>
-                            <th style="width: 50px;">g</th>
-                            <th style="width: 50px;">kcal</th>
-                            <th style="width: 25px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="meal-rows"></tbody>
-                </table>
-                <div class="add-food-form">
-                    <div class="input-group">
-                        <input type="text" class="form-input food-input" placeholder="Chercher un aliment..." onkeyup="handleAutocomplete(this)">
-                        <input type="number" class="form-input grams-input" placeholder="Grammes" style="width: 90px;">
-                        <button class="btn-add" onclick="addFoodToMeal(this, 'Collation')"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                    <div class="autocomplete-list"></div>
-                </div>
-            </div>
-
-            <!-- Dinner -->
-            <div class="meal-section" data-meal="Dîner">
-                <div class="meal-header">
-                    <div class="meal-title"><i class="fa-solid fa-moon" style="color:#E88D9B;"></i> Dîner</div>
-                    <div class="meal-calories"><span class="meal-total">0</span> kcal</div>
-                </div>
-                <table class="food-table">
-                    <thead>
-                        <tr>
-                            <th>Aliment</th>
-                            <th style="width: 50px;">g</th>
-                            <th style="width: 50px;">kcal</th>
-                            <th style="width: 25px;"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="meal-rows"></tbody>
-                </table>
-                <div class="add-food-form">
-                    <div class="input-group">
-                        <input type="text" class="form-input food-input" placeholder="Chercher un aliment..." onkeyup="handleAutocomplete(this)">
-                        <input type="number" class="form-input grams-input" placeholder="Grammes" style="width: 90px;">
-                        <button class="btn-add" onclick="addFoodToMeal(this, 'Dîner')"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                    <div class="autocomplete-list"></div>
-                </div>
-            </div>
-        </div>
+    <!-- ONGLET 1 : REPAS -->
+    <div id="tab-repas" class="tab-content active">
+      <div id="meals-container"></div>
     </div>
 
-    <!-- TAB 2: COURBE DE POIDS -->
+    <!-- ONGLET 2 : POIDS -->
     <div id="tab-poids" class="tab-content">
-        <div class="card">
-            <div class="card-title">
-                <i class="fa-solid fa-scale-balanced"></i> Mon Évolution de Poids
-            </div>
-            
-            <div class="weight-hero">
-                <div class="weight-stat">
-                    <div class="weight-lbl">Poids Initial (26/04)</div>
-                    <div class="weight-num" id="startWeightDisplay">77.0 kg</div>
-                </div>
-                <div class="smiley-box" id="weightSmiley">🥰</div>
-                <div class="weight-stat">
-                    <div class="weight-lbl">Poids Actuel</div>
-                    <div class="weight-num" id="currentWeightDisplay">65.0 kg</div>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-bottom: 15px; background: #FFF5F7; padding: 10px; border-radius: 12px; font-weight: 600; color: var(--primary-dark);">
-                🎉 Déjà <span id="totalLostDisplay">12.0</span> kg perdus ! Bravo Nathalie !
-            </div>
-
-            <!-- Weight Input Form -->
-            <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-                <input type="date" id="weightDateInput" class="form-input">
-                <input type="number" step="0.1" id="weightValInput" class="form-input" placeholder="Poids (kg)">
-                <button class="btn-add" onclick="saveWeightEntry()">Ajouter</button>
-            </div>
-
-            <!-- SVG Weight Evolution Chart -->
-            <div class="chart-container">
-                <svg id="weightChart" viewBox="0 0 350 160">
-                    <defs>
-                        <linearGradient id="pinkGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#E88D9B"/>
-                            <stop offset="100%" stop-color="#FFF5F7"/>
-                        </linearGradient>
-                    </defs>
-                    <path class="chart-area" d="" id="chartAreaPath"/>
-                    <path class="chart-line" d="" id="chartLinePath"/>
-                    <g id="chartPoints"></g>
-                </svg>
-            </div>
+      <div class="card">
+        <div class="card-title">⚖️ Saisie du Poids du Jour</div>
+        <div class="input-group">
+          <input type="number" step="0.1" id="weight-input" class="input-flex" placeholder="Poids en kg (ex: 68.5)">
+          <button class="btn-add" onclick="saveWeight()">Enregistrer</button>
         </div>
-
-        <!-- Weight History Log -->
-        <div class="card">
-            <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Historique des Pesées</div>
-            <div id="weightLogList"></div>
-        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 Historique des pesées</div>
+        <ul id="weight-history" class="item-list"></ul>
+      </div>
     </div>
 
-    <!-- TAB 3: ACTIVITÉ PHYSIQUE -->
+    <!-- ONGLET 3 : ACTIVITÉ -->
     <div id="tab-activite" class="tab-content">
-        <div class="card">
-            <div class="card-title"><i class="fa-solid fa-person-walking"></i> Activité Quotidienne</div>
-            
-            <div class="activity-grid">
-                <div class="act-box">
-                    <i class="fa-solid fa-shoe-prints"></i>
-                    <div class="act-val" id="actSteps">0</div>
-                    <div class="act-lbl">Pas</div>
-                </div>
-                <div class="act-box">
-                    <i class="fa-solid fa-route"></i>
-                    <div class="act-val" id="actKm">0.0</div>
-                    <div class="act-lbl">km</div>
-                </div>
-                <div class="act-box">
-                    <i class="fa-solid fa-fire-flame-curved"></i>
-                    <div class="act-val" id="actKcal">0</div>
-                    <div class="act-lbl">kcal brûlées</div>
-                </div>
-            </div>
-
-            <div style="margin-top: 15px;">
-                <h4 style="font-size: 0.9rem; color: var(--primary-dark); margin-bottom: 10px;">Enregistrer la marche du jour :</h4>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <div class="input-group">
-                        <input type="number" id="inputSteps" class="form-input" placeholder="Nombre de pas (ex: 8500)">
-                        <input type="number" step="0.1" id="inputKm" class="form-input" placeholder="Kilomètres (ex: 5.5)">
-                    </div>
-                    <div class="input-group">
-                        <input type="number" id="inputActKcal" class="form-input" placeholder="Calories dépensées (ex: 280)">
-                        <button class="btn-add" onclick="saveActivity()"><i class="fa-solid fa-check"></i> Enregistrer</button>
-                    </div>
-                </div>
-            </div>
+      <div class="card">
+        <div class="card-title">🏃‍♀️ Saisir une activité (Marche)</div>
+        <div class="input-group">
+          <input type="date" id="activity-date" class="input-flex">
         </div>
+        <div class="input-group">
+          <input type="number" id="activity-duration" class="input-flex" placeholder="Durée (minutes)">
+          <input type="number" id="activity-steps" class="input-flex" placeholder="Nombre de pas">
+          <button class="btn-add" onclick="addActivity()">Ajouter</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📜 Historique des activités</div>
+        <ul id="activity-list" class="item-list"></ul>
+      </div>
     </div>
 
-    <!-- TAB 4: BASE ALIMENTS -->
+    <!-- ONGLET 4 : ALIMENTS (BASE DE DONNÉES) -->
     <div id="tab-aliments" class="tab-content">
-        <div class="card">
-            <div class="card-title"><i class="fa-solid fa-database"></i> Base de Données Aliments</div>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
-                Ajoutez vos aliments favoris avec leurs calories pour 100g.
-            </p>
-
-            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <input type="text" id="newFoodName" class="form-input" placeholder="Nom (ex: Avocat)">
-                <input type="number" id="newFoodCal" class="form-input" placeholder="kcal/100g" style="width: 110px;">
-                <button class="btn-add" onclick="addFoodToDatabase()"><i class="fa-solid fa-plus"></i></button>
-            </div>
-
-            <div id="foodDbList" style="max-height: 320px; overflow-y: auto;"></div>
+      <div class="card">
+        <div class="card-title">🍎 Ajouter un aliment à la base</div>
+        <div class="input-group">
+          <input type="text" id="new-food-name" class="input-flex" placeholder="Nom (ex: Pomme)">
+          <input type="number" id="new-food-kcal" class="input-small" placeholder="kcal/100g">
+          <button class="btn-add" onclick="addCustomFood()">Créer</button>
         </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📖 Ma liste d'aliments</div>
+        <input type="text" id="search-food-db" placeholder="🔍 Rechercher dans ma base..." style="width:100%; margin-bottom:10px;" oninput="renderFoodDB()">
+        <ul id="food-db-list" class="item-list"></ul>
+      </div>
     </div>
 
-    <!-- TAB 5: MUR DES CÉLÉBRATIONS -->
-    <div id="tab-celebrations" class="tab-content">
-        <div class="card">
-            <div class="card-title"><i class="fa-solid fa-award"></i> Mur des Célébrations 👑</div>
-            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 15px; text-align: center;">
-                Chaque effort compte ! Voici vos badges et victoires débloqués.
-            </p>
-
-            <div class="badges-grid" id="badgesContainer">
-                <!-- Dynamic Badges -->
-            </div>
+    <!-- ONGLET 5 : RÉCAP CALORIES -->
+    <div id="tab-recap" class="tab-content">
+      <div class="card">
+        <div class="card-title">📊 Récapitulatif Hebdomadaire Calories</div>
+        <div class="input-group">
+          <label style="align-self:center; font-weight:bold; font-size:13px;">Semaine :</label>
+          <select id="recap-week-select" onchange="renderRecapTable()" class="input-flex"></select>
         </div>
+        <div id="recap-table-container"></div>
+      </div>
     </div>
 
-    <!-- Navigation Bar -->
-    <div class="nav-bar">
-        <button class="nav-btn active" onclick="switchTab('calories', this)">
-            <i class="fa-solid fa-utensils"></i>
-            <span>Repas</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('poids', this)">
-            <i class="fa-solid fa-chart-line"></i>
-            <span>Poids</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('activite', this)">
-            <i class="fa-solid fa-person-walking"></i>
-            <span>Activité</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('aliments', this)">
-            <i class="fa-solid fa-book-open"></i>
-            <span>Aliments</span>
-        </button>
-        <button class="nav-btn" onclick="switchTab('celebrations', this)">
-            <i class="fa-solid fa-crown"></i>
-            <span>Victoires</span>
-        </button>
+    <!-- SAUVEGARDE ET RESTAURATION -->
+    <div class="backup-box">
+      <h3 style="margin-top:0; font-size:15px; color:var(--text);">Sauvegarde de vos données</h3>
+      <p style="font-size:12px; color:#666; margin-bottom:12px;">Téléchargez une sauvegarde avant d'effacer Safari.</p>
+      <button class="btn-export" onclick="exporterDonnees()">💾 Exporter mes données</button>
+      <span style="display:inline-block; width:8px;"></span>
+      <label class="btn-import">
+        📂 Importer une sauvegarde
+        <input type="file" id="importFile" onchange="importerDonnees(event)" style="display: none;" accept=".json">
+      </label>
     </div>
 
-    <!-- JS Logic -->
-    <script>
-        // Data Structures & State
-        let currentDate = new Date();
-        const TARGET_CALORIES = 1300;
+  </div>
 
-        // Default Food Database (Calories per 100g)
-        const defaultFoodDb = [
-            { name: "Pomme", kcal: 52 },
-            { name: "Poulet (blanc)", kcal: 165 },
-            { name: "Pain complet", kcal: 247 },
-            { name: "Flocons d'avoine", kcal: 368 },
-            { name: "Yaourt nature", kcal: 60 },
-            { name: "Avocat", kcal: 160 },
-            { name: "Saumon grillé", kcal: 206 },
-            { name: "Riz basmati cuit", kcal: 130 },
-            { name: "Salade verte", kcal: 15 },
-            { name: "Œuf dur (1 unité ~ 50g)", kcal: 155 },
-            { name: "Amandes", kcal: 579 },
-            { name: "Banane", kcal: 89 },
-            { name: "Fromage blanc 0%", kcal: 48 },
-            { name: "Huile d'olive", kcal: 884 },
-            { name: "Concombre", kcal: 15 }
-        ];
+  <!-- NAVIGATION EN BAS -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('repas')">
+      <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.46 3.9 3.45 4.35L4 22h2.1l1.9-8h2l1.9 8H14l-2.45-8.65C13.54 12.9 15 11.12 15 9V2h-2v7h-2zm9-7h-3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h1v8h2V4c0-1.1-.9-2-2-2z"/></svg>
+      Repas
+    </button>
+    <button class="nav-item" onclick="switchTab('poids')">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 13c-2.33 0-4.31-1.46-5.11-3.5h10.22c-.8 2.04-2.78 3.5-5.11 3.5z"/></svg>
+      Poids
+    </button>
+    <button class="nav-item" onclick="switchTab('activite')">
+      <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg>
+      Activité
+    </button>
+    <button class="nav-item" onclick="switchTab('aliments')">
+      <svg viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+      Aliments
+    </button>
+    <button class="nav-item" onclick="switchTab('recap')">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      Récap' Kcal
+    </button>
+  </nav>
 
-        // Sample initial weight history starting on 26/04/2026 (-12kg progress)
-        const defaultWeightData = [
-            { date: "2026-04-26", weight: 77.0 },
-            { date: "2026-05-15", weight: 74.2 },
-            { date: "2026-06-01", weight: 71.5 },
-            { date: "2026-06-20", weight: 68.8 },
-            { date: "2026-07-10", weight: 66.4 },
-            { date: "2026-07-29", weight: 65.0 }
-        ];
+  <script>
+    // --- GESTION DES DATES & SEMAINES ---
+    // Point de référence : Lundi 27 Juillet 2026 = Semaine 15
+    const REF_DATE = new Date(2026, 6, 27); // Note: Mois 0-indexé (6 = Juillet)
+    const REF_WEEK = 15;
 
-        // App Initialization
-        let foodDb = JSON.parse(localStorage.getItem('minceur_foodDb')) || defaultFoodDb;
-        let weightLog = JSON.parse(localStorage.getItem('minceur_weightLog')) || defaultWeightData;
-        let dailyMeals = JSON.parse(localStorage.getItem('minceur_dailyMeals')) || {};
-        let dailyActivities = JSON.parse(localStorage.getItem('minceur_activities')) || {};
+    let currentDate = new Date();
 
-        document.addEventListener("DOMContentLoaded", () => {
-            initHeaderDate();
-            renderSelectedDateDisplay();
-            loadMealsForDate();
-            renderFoodDbList();
-            renderWeightTab();
-            loadActivityForDate();
-            renderBadges();
+    function getWeekNumber(d) {
+      const date = new Date(d);
+      date.setHours(0,0,0,0);
+      // Trouver le lundi de la semaine en cours
+      const day = date.getDay();
+      const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(date.setDate(diffToMonday));
+      
+      const diffTime = monday.getTime() - REF_DATE.getTime();
+      const diffWeeks = Math.round(diffTime / (7 * 24 * 60 * 60 * 1000));
+      return REF_WEEK + diffWeeks;
+    }
+
+    function formatDateKey(d) {
+      return d.toISOString().slice(0, 10);
+    }
+
+    function formatDateDisplay(d) {
+      const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+      return d.toLocaleDateString('fr-FR', options);
+    }
+
+    function changeDate(delta) {
+      currentDate.setDate(currentDate.getDate() + delta);
+      updateAppView();
+    }
+
+    // --- BASE DE DONNÉES ALIMENTS ---
+    const defaultFoods = [
+      { name: "Pomme", kcal: 52 },
+      { name: "Poulet (blanc)", kcal: 120 },
+      { name: "Riz cuit", kcal: 130 },
+      { name: "Pain complet", kcal: 247 },
+      { name: "Huile d'olive", kcal: 884 },
+      { name: "Oeuf", kcal: 155 },
+      { name: "Flocons d'avoine", kcal: 368 },
+      { name: "Yaourt nature", kcal: 50 },
+      { name: "Pâtes cuites", kcal: 131 },
+      { name: "Banane", kcal: 89 }
+    ];
+
+    function getFoodDB() {
+      const stored = localStorage.getItem('food_db');
+      return stored ? JSON.parse(stored) : defaultFoods;
+    }
+
+    function saveFoodDB(db) {
+      localStorage.setItem('food_db', JSON.stringify(db));
+    }
+
+    // --- DONNÉES REPAS ---
+    const MEAL_TYPES = ['Petit-déjeuner', 'Déjeuner', 'Collation', 'Dîner'];
+
+    function getMealData(dateKey) {
+      const stored = localStorage.getItem(`meals_${dateKey}`);
+      return stored ? JSON.parse(stored) : { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
+    }
+
+    function saveMealData(dateKey, data) {
+      localStorage.setItem(`meals_${dateKey}`, JSON.stringify(data));
+    }
+
+    // --- INITIALISATION AU CHARGEMENT ---
+    window.onload = function() {
+      // Date par défaut pour l'activité : aujourd'hui
+      document.getElementById('activity-date').value = formatDateKey(currentDate);
+      updateAppView();
+      populateRecapWeekSelect();
+    };
+
+    function updateAppView() {
+      const dateKey = formatDateKey(currentDate);
+      document.getElementById('current-date-display').innerText = formatDateDisplay(currentDate);
+      document.getElementById('week-display').innerText = `Semaine ${getWeekNumber(currentDate)}`;
+      
+      renderMealsView(dateKey);
+      renderWeightView(dateKey);
+      renderActivityList();
+      renderFoodDB();
+    }
+
+    // --- ONGLET 1 : REPAS ---
+    function renderMealsView(dateKey) {
+      const mealsData = getMealData(dateKey);
+      const foodDB = getFoodDB();
+      const container = document.getElementById('meals-container');
+      container.innerHTML = '';
+
+      MEAL_TYPES.forEach(meal => {
+        const items = mealsData[meal] || [];
+        const mealKcal = items.reduce((sum, item) => sum + item.kcalTotal, 0);
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="card-title">
+            <span>${getMealIcon(meal)} ${meal}</span>
+            <span style="font-size:14px; color:var(--primary);">${mealKcal} kcal</span>
+          </div>
+          <div class="input-group">
+            <input type="text" list="food-options-${meal.replace(/ /g,'')}" id="input-food-${meal}" class="input-flex" placeholder="Chercher un aliment..." oninput="checkFoodExists('${meal}')">
+            <datalist id="food-options-${meal.replace(/ /g,'')}">
+              ${foodDB.map(f => `<option value="${f.name}">${f.kcal} kcal/100g</option>`).join('')}
+            </datalist>
+            <input type="number" id="input-qty-${meal}" class="input-small" placeholder="Grammes">
+            <button class="btn-add" onclick="addFoodToMeal('${meal}')">+</button>
+          </div>
+          
+          <div id="quick-create-${meal}" class="quick-create-food">
+            <p>Cet aliment n'existe pas. Créer rapidement :</p>
+            <div class="input-group">
+              <input type="number" id="quick-kcal-${meal}" class="input-flex" placeholder="Kcal pour 100g">
+              <button class="btn-add" style="background:var(--accent-blue);" onclick="quickCreateAndAdd('${meal}')">Créer & Ajouter</button>
+            </div>
+          </div>
+
+          <ul class="item-list">
+            ${items.map((item, idx) => `
+              <li class="item-row">
+                <span><strong>${item.name}</strong></span>
+                <div class="item-actions">
+                  <span class="qty-edit" title="Cliquez pour modifier" onclick="editItemQty('${meal}', ${idx})">${item.qty}g</span>
+                  <span style="font-size:12px; color:#718096;">${item.kcalTotal} kcal</span>
+                  <button class="btn-delete" onclick="deleteMealItem('${meal}', ${idx})">✕</button>
+                </div>
+              </li>
+            `).join('')}
+          </ul>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function getMealIcon(meal) {
+      if (meal === 'Petit-déjeuner') return '☕';
+      if (meal === 'Déjeuner') return '🍽️';
+      if (meal === 'Collation') return '🍎';
+      return '🌙';
+    }
+
+    function checkFoodExists(meal) {
+      const val = document.getElementById(`input-food-${meal}`).value.trim();
+      const db = getFoodDB();
+      const exists = db.some(f => f.name.toLowerCase() === val.toLowerCase());
+      const quickBox = document.getElementById(`quick-create-${meal}`);
+      if (val.length > 1 && !exists) {
+        quickBox.style.display = 'block';
+      } else {
+        quickBox.style.display = 'none';
+      }
+    }
+
+    function addFoodToMeal(meal) {
+      const dateKey = formatDateKey(currentDate);
+      const foodName = document.getElementById(`input-food-${meal}`).value.trim();
+      const qty = parseFloat(document.getElementById(`input-qty-${meal}`).value);
+      const db = getFoodDB();
+
+      const foodObj = db.find(f => f.name.toLowerCase() === foodName.toLowerCase());
+      if (!foodObj || !qty) {
+        alert("Veuillez sélectionner un aliment valide dans la liste et entrer une quantité.");
+        return;
+      }
+
+      const kcalTotal = Math.round((foodObj.kcal * qty) / 100);
+      const mealsData = getMealData(dateKey);
+      mealsData[meal].push({ name: foodObj.name, qty: qty, kcalTotal: kcalTotal, kcalPer100: foodObj.kcal });
+      
+      saveMealData(dateKey, mealsData);
+      renderMealsView(dateKey);
+    }
+
+    function quickCreateAndAdd(meal) {
+      const foodName = document.getElementById(`input-food-${meal}`).value.trim();
+      const kcalPer100 = parseFloat(document.getElementById(`quick-kcal-${meal}`).value);
+      if (!foodName || !kcalPer100) {
+        alert("Veuillez remplir le nom et le nombre de calories.");
+        return;
+      }
+      
+      const db = getFoodDB();
+      db.push({ name: foodName, kcal: kcalPer100 });
+      saveFoodDB(db);
+
+      document.getElementById(`quick-create-${meal}`).style.display = 'none';
+      addFoodToMeal(meal);
+    }
+
+    function editItemQty(meal, idx) {
+      const dateKey = formatDateKey(currentDate);
+      const mealsData = getMealData(dateKey);
+      const item = mealsData[meal][idx];
+
+      const newQtyStr = prompt(`Modifier la quantité pour "${item.name}" (en grammes) :`, item.qty);
+      if (newQtyStr !== null) {
+        const newQty = parseFloat(newQtyStr);
+        if (newQty > 0) {
+          item.qty = newQty;
+          item.kcalTotal = Math.round((item.kcalPer100 * newQty) / 100);
+          saveMealData(dateKey, mealsData);
+          renderMealsView(dateKey);
+        }
+      }
+    }
+
+    function deleteMealItem(meal, idx) {
+      const dateKey = formatDateKey(currentDate);
+      const mealsData = getMealData(dateKey);
+      mealsData[meal].splice(idx, 1);
+      saveMealData(dateKey, mealsData);
+      renderMealsView(dateKey);
+    }
+
+    // --- ONGLET 2 : POIDS ---
+    function renderWeightView(dateKey) {
+      const weights = JSON.parse(localStorage.getItem('weight_history') || '{}');
+      document.getElementById('weight-input').value = weights[dateKey] || '';
+
+      const historyUl = document.getElementById('weight-history');
+      historyUl.innerHTML = '';
+      const sortedKeys = Object.keys(weights).sort().reverse();
+      
+      sortedKeys.forEach(k => {
+        const li = document.createElement('li');
+        li.className = 'item-row';
+        li.innerHTML = `<span>${k} (Semaine ${getWeekNumber(new Date(k))})</span><strong>${weights[k]} kg</strong>`;
+        historyUl.appendChild(li);
+      });
+    }
+
+    function saveWeight() {
+      const dateKey = formatDateKey(currentDate);
+      const val = parseFloat(document.getElementById('weight-input').value);
+      const weights = JSON.parse(localStorage.getItem('weight_history') || '{}');
+      
+      if (val) {
+        weights[dateKey] = val;
+      } else {
+        delete weights[dateKey];
+      }
+      localStorage.setItem('weight_history', JSON.stringify(weights));
+      renderWeightView(dateKey);
+      alert("Poids enregistré !");
+    }
+
+    // --- ONGLET 3 : ACTIVITÉ (RETROACTIVE) ---
+    function addActivity() {
+      const actDate = document.getElementById('activity-date').value;
+      const duration = document.getElementById('activity-duration').value;
+      const steps = document.getElementById('activity-steps').value;
+
+      if (!actDate || (!duration && !steps)) {
+        alert("Veuillez choisir une date et entrer au moins la durée ou les pas.");
+        return;
+      }
+
+      const activities = JSON.parse(localStorage.getItem('activity_history') || '[]');
+      activities.push({
+        id: Date.now(),
+        date: actDate,
+        duration: duration || 0,
+        steps: steps || 0
+      });
+
+      localStorage.setItem('activity_history', JSON.stringify(activities));
+      document.getElementById('activity-duration').value = '';
+      document.getElementById('activity-steps').value = '';
+      renderActivityList();
+    }
+
+    function renderActivityList() {
+      const activities = JSON.parse(localStorage.getItem('activity_history') || '[]');
+      const ul = document.getElementById('activity-list');
+      ul.innerHTML = '';
+
+      activities.sort((a,b) => b.date.localeCompare(a.date)).forEach(act => {
+        const weekNum = getWeekNumber(new Date(act.date));
+        const li = document.createElement('li');
+        li.className = 'item-row';
+        li.innerHTML = `
+          <div>
+            <strong>${act.date}</strong> <small style="color:#718096;">(Sem. ${weekNum})</small><br>
+            <span style="font-size:12px; color:var(--secondary);">🚶 Marche : ${act.duration} min | ${act.steps} pas</span>
+          </div>
+          <button class="btn-delete" onclick="deleteActivity(${act.id})">✕</button>
+        `;
+        ul.appendChild(li);
+      });
+    }
+
+    function deleteActivity(id) {
+      let activities = JSON.parse(localStorage.getItem('activity_history') || '[]');
+      activities = activities.filter(a => a.id !== id);
+      localStorage.setItem('activity_history', JSON.stringify(activities));
+      renderActivityList();
+    }
+
+    // --- ONGLET 4 : BASE ALIMENTS ---
+    function renderFoodDB() {
+      const db = getFoodDB();
+      const search = document.getElementById('search-food-db').value.toLowerCase();
+      const ul = document.getElementById('food-db-list');
+      ul.innerHTML = '';
+
+      db.filter(f => f.name.toLowerCase().includes(search))
+        .sort((a,b) => a.name.localeCompare(b.name))
+        .forEach((f, idx) => {
+          const li = document.createElement('li');
+          li.className = 'item-row';
+          li.innerHTML = `
+            <span>${f.name}</span>
+            <div class="item-actions">
+              <strong>${f.kcal} kcal / 100g</strong>
+              <button class="btn-delete" onclick="deleteCustomFood('${f.name}')">✕</button>
+            </div>
+          `;
+          ul.appendChild(li);
         });
+    }
 
-        // Date Utilities
-        function formatDateKey(d) {
-            return d.toISOString().split('T')[0];
+    function addCustomFood() {
+      const name = document.getElementById('new-food-name').value.trim();
+      const kcal = parseFloat(document.getElementById('new-food-kcal').value);
+      if (!name || !kcal) {
+        alert("Veuillez renseigner le nom et les calories.");
+        return;
+      }
+      const db = getFoodDB();
+      db.push({ name: name, kcal: kcal });
+      saveFoodDB(db);
+      document.getElementById('new-food-name').value = '';
+      document.getElementById('new-food-kcal').value = '';
+      renderFoodDB();
+      renderMealsView(formatDateKey(currentDate));
+    }
+
+    function deleteCustomFood(name) {
+      let db = getFoodDB();
+      db = db.filter(f => f.name !== name);
+      saveFoodDB(db);
+      renderFoodDB();
+    }
+
+    // --- ONGLET 5 : RÉCAP CALORIES ---
+    function populateRecapWeekSelect() {
+      const select = document.getElementById('recap-week-select');
+      select.innerHTML = '';
+      const currentW = getWeekNumber(new Date());
+
+      // Proposer de la semaine 15 à la semaine actuelle + 2
+      for (let w = 15; w <= Math.max(currentW + 2, 20); w++) {
+        const opt = document.createElement('option');
+        opt.value = w;
+        opt.innerText = `Semaine ${w}`;
+        if (w === currentW) opt.selected = true;
+        select.appendChild(opt);
+      }
+      renderRecapTable();
+    }
+
+    function renderRecapTable() {
+      const targetWeek = parseInt(document.getElementById('recap-week-select').value);
+      const container = document.getElementById('recap-table-container');
+      
+      // Trouver tous les jours du localStorage qui tombent dans cette semaine
+      let html = `
+        <table class="recap-table">
+          <thead>
+            <tr>
+              <th>Jour</th>
+              <th>P.Déj</th>
+              <th>Déj</th>
+              <th>Col.</th>
+              <th>Dîn</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      // Parcourir les 7 jours de la semaine cible (du Lundi au Dimanche)
+      // Calculer le lundi correspondant à targetWeek
+      const weeksDiff = targetWeek - REF_WEEK;
+      const mondayDate = new Date(REF_DATE);
+      mondayDate.setDate(mondayDate.getDate() + (weeksDiff * 7));
+
+      let totalSemaine = 0;
+
+      for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(mondayDate);
+        dayDate.setDate(dayDate.getDate() + i);
+        const dayKey = formatDateKey(dayDate);
+        const dayMeals = getMealData(dayKey);
+
+        const pDej = (dayMeals['Petit-déjeuner'] || []).reduce((s, x) => s + x.kcalTotal, 0);
+        const dej = (dayMeals['Déjeuner'] || []).reduce((s, x) => s + x.kcalTotal, 0);
+        const col = (dayMeals['Collation'] || []).reduce((s, x) => s + x.kcalTotal, 0);
+        const din = (dayMeals['Dîner'] || []).reduce((s, x) => s + x.kcalTotal, 0);
+        const dayTotal = pDej + dej + col + din;
+        totalSemaine += dayTotal;
+
+        const dayName = dayDate.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
+
+        html += `
+          <tr>
+            <td><strong>${dayName}</strong></td>
+            <td>${pDej || '-'}</td>
+            <td>${dej || '-'}</td>
+            <td>${col || '-'}</td>
+            <td>${din || '-'}</td>
+            <td class="recap-total">${dayTotal ? dayTotal + ' kcal' : '-'}</td>
+          </tr>
+        `;
+      }
+
+      html += `
+          </tbody>
+          <tfoot>
+            <tr class="recap-total" style="background-color: var(--primary-light); color: var(--primary);">
+              <td colspan="5">TOTAL SEMAINE ${targetWeek}</td>
+              <td>${totalSemaine} kcal</td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    // --- NAVIGATION D'ONGLETS ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      event.currentTarget.classList.add('active');
+
+      if (tabId === 'recap') {
+        populateRecapWeekSelect();
+      }
+    }
+
+    // --- EXPORT ET IMPORT SAUVEGARDE ---
+    function exporterDonnees() {
+      const donnees = JSON.stringify(localStorage);
+      const blob = new Blob([donnees], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const date = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `sauvegarde_carnet_${date}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function importerDonnees(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const donnees = JSON.parse(e.target.result);
+          for (let key in donnees) {
+            localStorage.setItem(key, donnees[key]);
+          }
+          alert('✅ Sauvegarde restaurée avec succès ! La page va se recharger.');
+          location.reload();
+        } catch (err) {
+          alert('❌ Erreur lors de la lecture du fichier de sauvegarde.');
         }
-
-        function initHeaderDate() {
-            const options = { weekday: 'long', day: 'numeric', month: 'long' };
-            const str = new Date().toLocaleDateString('fr-FR', options);
-            document.getElementById('headerDate').innerText = str.charAt(0).toUpperCase() + str.slice(1);
-            document.getElementById('weightDateInput').value = formatDateKey(new Date());
-        }
-
-        function renderSelectedDateDisplay() {
-            const key = formatDateKey(currentDate);
-            const todayKey = formatDateKey(new Date());
-            if (key === todayKey) {
-                document.getElementById('displaySelectedDate').innerText = "Aujourd'hui";
-            } else {
-                const options = { day: 'numeric', month: 'short', year: 'numeric' };
-                document.getElementById('displaySelectedDate').innerText = currentDate.toLocaleDateString('fr-FR', options);
-            }
-        }
-
-        function changeDate(delta) {
-            currentDate.setDate(currentDate.getDate() + delta);
-            renderSelectedDateDisplay();
-            loadMealsForDate();
-            loadActivityForDate();
-        }
-
-        // Tab Switching
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            btn.classList.add('active');
-
-            if(tabId === 'poids') renderWeightTab();
-            if(tabId === 'celebrations') renderBadges();
-        }
-
-        // --- CALORIES & MEALS LOGIC ---
-        function loadMealsForDate() {
-            const key = formatDateKey(currentDate);
-            const dayData = dailyMeals[key] || { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
-
-            let grandTotal = 0;
-
-            ['Petit-déjeuner', 'Déjeuner', 'Collation', 'Dîner'].forEach(mealName => {
-                const mealSection = document.querySelector(`.meal-section[data-meal="${mealName}"]`);
-                const tbody = mealSection.querySelector('.meal-rows');
-                tbody.innerHTML = '';
-
-                const items = dayData[mealName] || [];
-                let mealTotal = 0;
-
-                items.forEach((item, index) => {
-                    mealTotal += item.kcalTotal;
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><strong>${item.name}</strong></td>
-                        <td>${item.grams}g</td>
-                        <td>${item.kcalTotal}</td>
-                        <td><button class="btn-delete-row" onclick="deleteMealItem('${mealName}', ${index})"><i class="fa-solid fa-xmark"></i></button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                mealSection.querySelector('.meal-total').innerText = Math.round(mealTotal);
-                grandTotal += mealTotal;
-            });
-
-            updateDonutChart(grandTotal);
-        }
-
-        function updateDonutChart(consumed) {
-            consumed = Math.round(consumed);
-            const remaining = Math.max(0, TARGET_CALORIES - consumed);
-
-            document.getElementById('caloriesConsumed').innerText = consumed;
-            document.getElementById('caloriesRemaining').innerText = remaining;
-
-            // Circle stroke calculations
-            const circle = document.getElementById('donutProgress');
-            const radius = 70;
-            const circumference = 2 * Math.PI * radius; // ~440
-            const percentage = Math.min(1, consumed / TARGET_CALORIES);
-            const offset = circumference - (percentage * circumference);
-
-            circle.style.strokeDashoffset = offset;
-
-            if (consumed > TARGET_CALORIES) {
-                circle.style.stroke = "#FF6B6B"; // Warning red if over target
-            } else {
-                circle.style.stroke = "var(--primary)";
-            }
-        }
-
-        // Autocomplete Search
-        function handleAutocomplete(inputEl) {
-            const val = inputEl.value.trim().toLowerCase();
-            const listEl = inputEl.closest('.add-food-form').querySelector('.autocomplete-list');
-
-            if (val.length < 2) {
-                listEl.style.display = 'none';
-                return;
-            }
-
-            const matches = foodDb.filter(f => f.name.toLowerCase().includes(val));
-            if (matches.length === 0) {
-                listEl.style.display = 'none';
-                return;
-            }
-
-            listEl.innerHTML = '';
-            matches.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'autocomplete-item';
-                div.innerHTML = `<span>${item.name}</span><span style="color:var(--text-muted); font-size:0.75rem;">${item.kcal} kcal/100g</span>`;
-                div.onclick = () => {
-                    inputEl.value = item.name;
-                    inputEl.dataset.kcal = item.kcal;
-                    listEl.style.display = 'none';
-                };
-                listEl.appendChild(div);
-            });
-            listEl.style.display = 'block';
-        }
-
-        function addFoodToMeal(btn, mealName) {
-            const form = btn.closest('.add-food-form');
-            const inputFood = form.querySelector('.food-input');
-            const inputGrams = form.querySelector('.grams-input');
-
-            const foodName = inputFood.value.trim();
-            const grams = parseFloat(inputGrams.value);
-
-            if (!foodName || isNaN(grams) || grams <= 0) {
-                alert("Veuillez entrer un nom d'aliment et une quantité en grammes valide.");
-                return;
-            }
-
-            // Find kcal per 100g
-            let kcal100 = parseFloat(inputFood.dataset.kcal);
-            if (!kcal100) {
-                const found = foodDb.find(f => f.name.toLowerCase() === foodName.toLowerCase());
-                kcal100 = found ? found.kcal : 100; // default to 100 if unknown
-            }
-
-            const kcalTotal = Math.round((grams * kcal100) / 100);
-
-            const key = formatDateKey(currentDate);
-            if (!dailyMeals[key]) {
-                dailyMeals[key] = { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
-            }
-
-            dailyMeals[key][mealName].push({
-                name: foodName,
-                grams: grams,
-                kcalTotal: kcalTotal
-            });
-
-            localStorage.setItem('minceur_dailyMeals', JSON.stringify(dailyMeals));
-
-            // Reset inputs
-            inputFood.value = '';
-            inputGrams.value = '';
-            delete inputFood.dataset.kcal;
-
-            loadMealsForDate();
-            renderBadges();
-        }
-
-        function deleteMealItem(mealName, index) {
-            const key = formatDateKey(currentDate);
-            if (dailyMeals[key] && dailyMeals[key][mealName]) {
-                dailyMeals[key][mealName].splice(index, 1);
-                localStorage.setItem('minceur_dailyMeals', JSON.stringify(dailyMeals));
-                loadMealsForDate();
-            }
-        }
-
-        // --- FOOD DATABASE LOGIC ---
-        function renderFoodDbList() {
-            const container = document.getElementById('foodDbList');
-            container.innerHTML = '';
-            foodDb.sort((a,b) => a.name.localeCompare(b.name)).forEach((item, idx) => {
-                const div = document.createElement('div');
-                div.className = 'db-list-item';
-                div.innerHTML = `
-                    <span><strong>${item.name}</strong></span>
-                    <span>${item.kcal} kcal / 100g 
-                    <button style="border:none; background:none; color:#FF7B7B; margin-left:8px; cursor:pointer;" onclick="deleteFoodFromDb(${idx})"><i class="fa-solid fa-trash-can"></i></button></span>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function addFoodToDatabase() {
-            const nameEl = document.getElementById('newFoodName');
-            const calEl = document.getElementById('newFoodCal');
-
-            const name = nameEl.value.trim();
-            const kcal = parseFloat(calEl.value);
-
-            if (!name || isNaN(kcal)) {
-                alert("Veuillez renseigner le nom et les calories.");
-                return;
-            }
-
-            foodDb.push({ name, kcal });
-            localStorage.setItem('minceur_foodDb', JSON.stringify(foodDb));
-            nameEl.value = '';
-            calEl.value = '';
-            renderFoodDbList();
-        }
-
-        function deleteFoodFromDb(index) {
-            foodDb.splice(index, 1);
-            localStorage.setItem('minceur_foodDb', JSON.stringify(foodDb));
-            renderFoodDbList();
-        }
-
-        // --- WEIGHT TRACKING LOGIC ---
-        function renderWeightTab() {
-            // Sort by date
-            weightLog.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            if (weightLog.length > 0) {
-                const startWeight = weightLog[0].weight;
-                const currentWeight = weightLog[weightLog.length - 1].weight;
-                const totalLost = (startWeight - currentWeight).toFixed(1);
-
-                document.getElementById('startWeightDisplay').innerText = startWeight.toFixed(1) + " kg";
-                document.getElementById('currentWeightDisplay').innerText = currentWeight.toFixed(1) + " kg";
-                document.getElementById('totalLostDisplay').innerText = totalLost;
-
-                // Smiley Logic
-                const smileyEl = document.getElementById('weightSmiley');
-                if (weightLog.length >= 2) {
-                    const prevWeight = weightLog[weightLog.length - 2].weight;
-                    const diff = currentWeight - prevWeight;
-                    if (diff < -0.2) {
-                        smileyEl.innerText = "🥰🌸"; // Perte de poids
-                    } else if (Math.abs(diff) <= 0.2) {
-                        smileyEl.innerText = "😐"; // Stagnation
-                    } else {
-                        smileyEl.innerText = "🥺"; // Reprise
-                    }
-                } else {
-                    smileyEl.innerText = "🥰";
-                }
-            }
-
-            // Render History List
-            const listContainer = document.getElementById('weightLogList');
-            listContainer.innerHTML = '';
-            [...weightLog].reverse().forEach((entry, idx) => {
-                const originalIndex = weightLog.length - 1 - idx;
-                const d = new Date(entry.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-                const div = document.createElement('div');
-                div.className = 'db-list-item';
-                div.innerHTML = `
-                    <span><i class="fa-regular fa-calendar-heart" style="color:var(--primary);"></i> ${d}</span>
-                    <span><strong>${entry.weight.toFixed(1)} kg</strong>
-                    <button style="border:none; background:none; color:#FF7B7B; margin-left:8px; cursor:pointer;" onclick="deleteWeightEntry(${originalIndex})"><i class="fa-solid fa-xmark"></i></button></span>
-                `;
-                listContainer.appendChild(div);
-            });
-
-            drawWeightChart();
-        }
-
-        function saveWeightEntry() {
-            const dateVal = document.getElementById('weightDateInput').value;
-            const weightVal = parseFloat(document.getElementById('weightValInput').value);
-
-            if (!dateVal || isNaN(weightVal)) {
-                alert("Veuillez saisir une date et un poids valides.");
-                return;
-            }
-
-            // Update or push
-            const existingIdx = weightLog.findIndex(w => w.date === dateVal);
-            if (existingIdx >= 0) {
-                weightLog[existingIdx].weight = weightVal;
-            } else {
-                weightLog.push({ date: dateVal, weight: weightVal });
-            }
-
-            localStorage.setItem('minceur_weightLog', JSON.stringify(weightLog));
-            document.getElementById('weightValInput').value = '';
-            renderWeightTab();
-            renderBadges();
-        }
-
-        function deleteWeightEntry(idx) {
-            weightLog.splice(idx, 1);
-            localStorage.setItem('minceur_weightLog', JSON.stringify(weightLog));
-            renderWeightTab();
-        }
-
-        function drawWeightChart() {
-            if (weightLog.length < 2) return;
-
-            const svgWidth = 350;
-            const svgHeight = 160;
-            const padding = 25;
-
-            const weights = weightLog.map(w => w.weight);
-            const minW = Math.min(...weights) - 1;
-            const maxW = Math.max(...weights) + 1;
-
-            const points = weightLog.map((item, index) => {
-                const x = padding + (index / (weightLog.length - 1)) * (svgWidth - 2 * padding);
-                const y = svgHeight - padding - ((item.weight - minW) / (maxW - minW)) * (svgHeight - 2 * padding);
-                return { x, y, weight: item.weight };
-            });
-
-            // Build d path for line
-            let pathD = `M ${points[0].x} ${points[0].y}`;
-            points.forEach((p, i) => {
-                if (i > 0) pathD += ` L ${p.x} ${p.y}`;
-            });
-
-            document.getElementById('chartLinePath').setAttribute('d', pathD);
-
-            // Area path
-            const areaD = pathD + ` L ${points[points.length - 1].x} ${svgHeight - padding} L ${points[0].x} ${svgHeight - padding} Z`;
-            document.getElementById('chartAreaPath').setAttribute('d', areaD);
-
-            // Points
-            const pointsGroup = document.getElementById('chartPoints');
-            pointsGroup.innerHTML = '';
-            points.forEach(p => {
-                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                circle.setAttribute('cx', p.x);
-                circle.setAttribute('cy', p.y);
-                circle.setAttribute('class', 'chart-point');
-                pointsGroup.appendChild(circle);
-            });
-        }
-
-        // --- ACTIVITY LOGIC ---
-        function loadActivityForDate() {
-            const key = formatDateKey(currentDate);
-            const act = dailyActivities[key] || { steps: 0, km: 0, kcal: 0 };
-
-            document.getElementById('actSteps').innerText = act.steps.toLocaleString();
-            document.getElementById('actKm').innerText = act.km.toFixed(1);
-            document.getElementById('actKcal').innerText = act.kcal;
-        }
-
-        function saveActivity() {
-            const steps = parseInt(document.getElementById('inputSteps').value) || 0;
-            const km = parseFloat(document.getElementById('inputKm').value) || 0;
-            const kcal = parseInt(document.getElementById('inputActKcal').value) || 0;
-
-            const key = formatDateKey(currentDate);
-            dailyActivities[key] = { steps, km, kcal };
-
-            localStorage.setItem('minceur_activities', JSON.stringify(dailyActivities));
-
-            document.getElementById('inputSteps').value = '';
-            document.getElementById('inputKm').value = '';
-            document.getElementById('inputActKcal').value = '';
-
-            loadActivityForDate();
-            renderBadges();
-        }
-
-        // --- CELEBRATIONS & BADGES LOGIC ---
-        function renderBadges() {
-            weightLog.sort((a, b) => new Date(a.date) - new Date(b.date));
-            const startW = weightLog.length > 0 ? weightLog[0].weight : 77;
-            const currentW = weightLog.length > 0 ? weightLog[weightLog.length - 1].weight : 77;
-            const totalLost = startW - currentW;
-
-            // Check if user has logged max steps
-            let maxSteps = 0;
-            Object.values(dailyActivities).forEach(a => {
-                if (a.steps > maxSteps) maxSteps = a.steps;
-            });
-
-            const badges = [
-                { id: 'start', title: 'Départ Réussi', desc: 'Début du régime le 26/04/2026', icon: '🌱', unlocked: true },
-                { id: 'lost5', title: 'Cap 5 kg', desc: '5 kg éliminés !', icon: '🌸', unlocked: totalLost >= 5 },
-                { id: 'lost10', title: 'Super Cap 10 kg', desc: '10 kg de bonheur en moins', icon: '💖', unlocked: totalLost >= 10 },
-                { id: 'lost12', title: 'Victoire 12 kg !', desc: '-12 kg atteints avec succès !', icon: '👑', unlocked: totalLost >= 12 },
-                { id: 'walk5k', title: 'Marcheuse Zen', desc: 'Atteindre 5 000 pas', icon: '🚶‍♀️', unlocked: maxSteps >= 5000 },
-                { id: 'walk10k', title: 'Reine de la Marche', desc: 'Atteindre 10 000 pas en 1 jour', icon: '✨', unlocked: maxSteps >= 10000 }
-            ];
-
-            const container = document.getElementById('badgesContainer');
-            container.innerHTML = '';
-
-            badges.forEach(b => {
-                const card = document.createElement('div');
-                card.className = `badge-card ${b.unlocked ? 'unlocked' : ''}`;
-                card.innerHTML = `
-                    ${b.unlocked ? '<div class="badge-status"><i class="fa-solid fa-circle-check"></i></div>' : ''}
-                    <div class="badge-icon">${b.icon}</div>
-                    <div class="badge-title">${b.title}</div>
-                    <div class="badge-desc">${b.desc}</div>
-                `;
-                container.appendChild(card);
-            });
-        }
-    </script>
+      };
+      reader.readAsText(file);
+    }
+  </script>
 </body>
 </html>
-<!-- Bloc de sauvegarde et restauration des données -->
-<div style="margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; text-align: center;">
-  <h3 style="margin-top: 0; font-size: 16px;">Sauvegarde de vos données</h3>
-  <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
-    Téléchargez une sauvegarde avant d'effacer votre historique Safari.
-  </p>
-  
-  <button onclick="exporterDonnees()" style="padding: 10px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px;">
-    💾 Exporter mes données
-  </button>
-  
-  <br>
-  
-  <label style="padding: 10px 15px; background-color: #2196F3; color: white; border-radius: 5px; cursor: pointer; display: inline-block; font-weight: bold; margin-top: 5px;">
-    📂 Importer une sauvegarde
-    <input type="file" id="importFile" onchange="importerDonnees(event)" style="display: none;" accept=".json">
-  </label>
-</div>
-
-<script>
-function exporterDonnees() {
-  const donnees = JSON.stringify(localStorage);
-  const blob = new Blob([donnees], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const date = new Date().toISOString().slice(0, 10);
-  a.href = url;
-  a.download = `sauvegarde_carnet_${date}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function importerDonnees(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const donnees = JSON.parse(e.target.result);
-      for (let key in donnees) {
-        localStorage.setItem(key, donnees[key]);
-      }
-      alert('✅ Sauvegarde restaurée avec succès ! La page va se recharger.');
-      location.reload();
-    } catch (err) {
-      alert('❌ Erreur lors de la lecture du fichier de sauvegarde.');
-    }
-  };
-  reader.readAsText(file);
-}
-</script>
