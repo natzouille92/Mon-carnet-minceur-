@@ -22,7 +22,7 @@
     header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #f0d8df; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
     header h1 { margin: 0; font-size: 18px; color: var(--primary); font-weight: 700; }
     .date-nav { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 8px; font-weight: 600; }
-    .date-nav button { background: none; border: none; font-size: 18px; color: var(--primary); cursor: pointer; }
+    .date-nav button { background: none; border: none; font-size: 18px; color: var(--primary); cursor: pointer; padding: 5px 10px; }
     .week-badge { background: var(--primary-light); color: var(--primary); padding: 3px 8px; border-radius: 12px; font-size: 12px; margin-top: 4px; display: inline-block; font-weight: bold; }
 
     .container { padding: 15px; max-width: 600px; margin: 0 auto; }
@@ -39,7 +39,6 @@
     .input-flex { flex: 1; min-width: 120px; }
     .input-small { width: 75px; }
     button.btn-add { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    button.btn-add:hover { opacity: 0.9; }
 
     /* Lists */
     .item-list { list-style: none; padding: 0; margin: 0; }
@@ -49,7 +48,7 @@
     .qty-edit { background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 4px; padding: 2px 6px; font-weight: bold; cursor: pointer; color: var(--secondary); }
     .btn-delete { color: #e53e3e; background: none; border: none; cursor: pointer; font-size: 16px; padding: 0 4px; }
 
-    /* Quick Create Food Modal / Box */
+    /* Quick Create Food Box */
     .quick-create-food { background: #fffaf0; border: 1px solid #feebc8; padding: 10px; border-radius: 8px; margin-top: 8px; display: none; }
     .quick-create-food p { margin: 0 0 6px 0; font-size: 12px; color: #dd6b20; font-weight: bold; }
 
@@ -124,7 +123,7 @@
       </div>
     </div>
 
-    <!-- ONGLET 4 : ALIMENTS (BASE DE DONNÉES) -->
+    <!-- ONGLET 4 : ALIMENTS -->
     <div id="tab-aliments" class="tab-content">
       <div class="card">
         <div class="card-title">🍎 Ajouter un aliment à la base</div>
@@ -194,7 +193,7 @@
   <script>
     // --- GESTION DES DATES & SEMAINES ---
     // Point de référence : Lundi 27 Juillet 2026 = Semaine 15
-    const REF_DATE = new Date(2026, 6, 27); // Note: Mois 0-indexé (6 = Juillet)
+    const REF_DATE = new Date(2026, 6, 27);
     const REF_WEEK = 15;
 
     let currentDate = new Date();
@@ -202,7 +201,6 @@
     function getWeekNumber(d) {
       const date = new Date(d);
       date.setHours(0,0,0,0);
-      // Trouver le lundi de la semaine en cours
       const day = date.getDay();
       const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
       const monday = new Date(date.setDate(diffToMonday));
@@ -213,7 +211,10 @@
     }
 
     function formatDateKey(d) {
-      return d.toISOString().slice(0, 10);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
 
     function formatDateDisplay(d) {
@@ -241,7 +242,7 @@
     ];
 
     function getFoodDB() {
-      const stored = localStorage.getItem('food_db');
+      const stored = localStorage.getItem('food_db') || localStorage.getItem('aliments');
       return stored ? JSON.parse(stored) : defaultFoods;
     }
 
@@ -253,20 +254,25 @@
     const MEAL_TYPES = ['Petit-déjeuner', 'Déjeuner', 'Collation', 'Dîner'];
 
     function getMealData(dateKey) {
-      const stored = localStorage.getItem(`meals_${dateKey}`);
-      return stored ? JSON.parse(stored) : { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
+      // Lecture compatible ancienne & nouvelle structure
+      let stored = localStorage.getItem(`meals_${dateKey}`) || localStorage.getItem(`repas_${dateKey}`);
+      if (stored) {
+        let parsed = JSON.parse(stored);
+        MEAL_TYPES.forEach(m => { if (!parsed[m]) parsed[m] = []; });
+        return parsed;
+      }
+      return { 'Petit-déjeuner': [], 'Déjeuner': [], 'Collation': [], 'Dîner': [] };
     }
 
     function saveMealData(dateKey, data) {
       localStorage.setItem(`meals_${dateKey}`, JSON.stringify(data));
+      localStorage.setItem(`repas_${dateKey}`, JSON.stringify(data));
     }
 
-    // --- INITIALISATION AU CHARGEMENT ---
+    // --- INITIALISATION ---
     window.onload = function() {
-      // Date par défaut pour l'activité : aujourd'hui
       document.getElementById('activity-date').value = formatDateKey(currentDate);
       updateAppView();
-      populateRecapWeekSelect();
     };
 
     function updateAppView() {
@@ -278,6 +284,7 @@
       renderWeightView(dateKey);
       renderActivityList();
       renderFoodDB();
+      populateRecapWeekSelect();
     }
 
     // --- ONGLET 1 : REPAS ---
@@ -289,7 +296,7 @@
 
       MEAL_TYPES.forEach(meal => {
         const items = mealsData[meal] || [];
-        const mealKcal = items.reduce((sum, item) => sum + item.kcalTotal, 0);
+        const mealKcal = items.reduce((sum, item) => sum + (item.kcalTotal || item.kcal || 0), 0);
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -316,16 +323,19 @@
           </div>
 
           <ul class="item-list">
-            ${items.map((item, idx) => `
+            ${items.map((item, idx) => {
+              const qtyDisplay = item.qty || item.quantite || 0;
+              const kcalDisplay = item.kcalTotal || item.kcal || 0;
+              return `
               <li class="item-row">
-                <span><strong>${item.name}</strong></span>
+                <span><strong>${item.name || item.nom}</strong></span>
                 <div class="item-actions">
-                  <span class="qty-edit" title="Cliquez pour modifier" onclick="editItemQty('${meal}', ${idx})">${item.qty}g</span>
-                  <span style="font-size:12px; color:#718096;">${item.kcalTotal} kcal</span>
+                  <span class="qty-edit" title="Cliquez pour modifier" onclick="editItemQty('${meal}', ${idx})">${qtyDisplay}g</span>
+                  <span style="font-size:12px; color:#718096;">${kcalDisplay} kcal</span>
                   <button class="btn-delete" onclick="deleteMealItem('${meal}', ${idx})">✕</button>
                 </div>
               </li>
-            `).join('')}
+            `}).join('')}
           </ul>
         `;
         container.appendChild(card);
@@ -392,12 +402,16 @@
       const mealsData = getMealData(dateKey);
       const item = mealsData[meal][idx];
 
-      const newQtyStr = prompt(`Modifier la quantité pour "${item.name}" (en grammes) :`, item.qty);
+      const currentQty = item.qty || item.quantite || 100;
+      const kcalPer100 = item.kcalPer100 || (item.kcalTotal ? Math.round((item.kcalTotal / currentQty) * 100) : 100);
+
+      const newQtyStr = prompt(`Modifier la quantité pour "${item.name || item.nom}" (en grammes) :`, currentQty);
       if (newQtyStr !== null) {
         const newQty = parseFloat(newQtyStr);
         if (newQty > 0) {
           item.qty = newQty;
-          item.kcalTotal = Math.round((item.kcalPer100 * newQty) / 100);
+          item.kcalTotal = Math.round((kcalPer100 * newQty) / 100);
+          item.kcalPer100 = kcalPer100;
           saveMealData(dateKey, mealsData);
           renderMealsView(dateKey);
         }
@@ -414,7 +428,7 @@
 
     // --- ONGLET 2 : POIDS ---
     function renderWeightView(dateKey) {
-      const weights = JSON.parse(localStorage.getItem('weight_history') || '{}');
+      const weights = JSON.parse(localStorage.getItem('weight_history') || localStorage.getItem('poids') || '{}');
       document.getElementById('weight-input').value = weights[dateKey] || '';
 
       const historyUl = document.getElementById('weight-history');
@@ -424,7 +438,7 @@
       sortedKeys.forEach(k => {
         const li = document.createElement('li');
         li.className = 'item-row';
-        li.innerHTML = `<span>${k} (Semaine ${getWeekNumber(new Date(k))})</span><strong>${weights[k]} kg</strong>`;
+        li.innerHTML = `<span>${k} (Sem. ${getWeekNumber(new Date(k))})</span><strong>${weights[k]} kg</strong>`;
         historyUl.appendChild(li);
       });
     }
@@ -432,7 +446,7 @@
     function saveWeight() {
       const dateKey = formatDateKey(currentDate);
       const val = parseFloat(document.getElementById('weight-input').value);
-      const weights = JSON.parse(localStorage.getItem('weight_history') || '{}');
+      const weights = JSON.parse(localStorage.getItem('weight_history') || localStorage.getItem('poids') || '{}');
       
       if (val) {
         weights[dateKey] = val;
@@ -440,22 +454,23 @@
         delete weights[dateKey];
       }
       localStorage.setItem('weight_history', JSON.stringify(weights));
+      localStorage.setItem('poids', JSON.stringify(weights));
       renderWeightView(dateKey);
       alert("Poids enregistré !");
     }
 
-    // --- ONGLET 3 : ACTIVITÉ (RETROACTIVE) ---
+    // --- ONGLET 3 : ACTIVITÉ ---
     function addActivity() {
       const actDate = document.getElementById('activity-date').value;
       const duration = document.getElementById('activity-duration').value;
       const steps = document.getElementById('activity-steps').value;
 
       if (!actDate || (!duration && !steps)) {
-        alert("Veuillez choisir une date et entrer au moins la durée ou les pas.");
+        alert("Veuillez choisir une date et entrer la durée ou les pas.");
         return;
       }
 
-      const activities = JSON.parse(localStorage.getItem('activity_history') || '[]');
+      const activities = JSON.parse(localStorage.getItem('activity_history') || localStorage.getItem('activites') || '[]');
       activities.push({
         id: Date.now(),
         date: actDate,
@@ -464,13 +479,14 @@
       });
 
       localStorage.setItem('activity_history', JSON.stringify(activities));
+      localStorage.setItem('activites', JSON.stringify(activities));
       document.getElementById('activity-duration').value = '';
       document.getElementById('activity-steps').value = '';
       renderActivityList();
     }
 
     function renderActivityList() {
-      const activities = JSON.parse(localStorage.getItem('activity_history') || '[]');
+      const activities = JSON.parse(localStorage.getItem('activity_history') || localStorage.getItem('activites') || '[]');
       const ul = document.getElementById('activity-list');
       ul.innerHTML = '';
 
@@ -481,7 +497,7 @@
         li.innerHTML = `
           <div>
             <strong>${act.date}</strong> <small style="color:#718096;">(Sem. ${weekNum})</small><br>
-            <span style="font-size:12px; color:var(--secondary);">🚶 Marche : ${act.duration} min | ${act.steps} pas</span>
+            <span style="font-size:12px; color:var(--secondary);">🚶 Marche : ${act.duration || 0} min | ${act.steps || 0} pas</span>
           </div>
           <button class="btn-delete" onclick="deleteActivity(${act.id})">✕</button>
         `;
@@ -490,9 +506,10 @@
     }
 
     function deleteActivity(id) {
-      let activities = JSON.parse(localStorage.getItem('activity_history') || '[]');
+      let activities = JSON.parse(localStorage.getItem('activity_history') || localStorage.getItem('activites') || '[]');
       activities = activities.filter(a => a.id !== id);
       localStorage.setItem('activity_history', JSON.stringify(activities));
+      localStorage.setItem('activites', JSON.stringify(activities));
       renderActivityList();
     }
 
@@ -505,7 +522,7 @@
 
       db.filter(f => f.name.toLowerCase().includes(search))
         .sort((a,b) => a.name.localeCompare(b.name))
-        .forEach((f, idx) => {
+        .forEach((f) => {
           const li = document.createElement('li');
           li.className = 'item-row';
           li.innerHTML = `
@@ -545,25 +562,26 @@
     // --- ONGLET 5 : RÉCAP CALORIES ---
     function populateRecapWeekSelect() {
       const select = document.getElementById('recap-week-select');
-      select.innerHTML = '';
       const currentW = getWeekNumber(new Date());
-
-      // Proposer de la semaine 15 à la semaine actuelle + 2
+      const selectedVal = select.value;
+      
+      select.innerHTML = '';
       for (let w = 15; w <= Math.max(currentW + 2, 20); w++) {
         const opt = document.createElement('option');
         opt.value = w;
         opt.innerText = `Semaine ${w}`;
-        if (w === currentW) opt.selected = true;
+        if (selectedVal ? parseInt(selectedVal) === w : w === currentW) {
+          opt.selected = true;
+        }
         select.appendChild(opt);
       }
       renderRecapTable();
     }
 
     function renderRecapTable() {
-      const targetWeek = parseInt(document.getElementById('recap-week-select').value);
+      const targetWeek = parseInt(document.getElementById('recap-week-select').value) || 15;
       const container = document.getElementById('recap-table-container');
       
-      // Trouver tous les jours du localStorage qui tombent dans cette semaine
       let html = `
         <table class="recap-table">
           <thead>
@@ -579,8 +597,6 @@
           <tbody>
       `;
 
-      // Parcourir les 7 jours de la semaine cible (du Lundi au Dimanche)
-      // Calculer le lundi correspondant à targetWeek
       const weeksDiff = targetWeek - REF_WEEK;
       const mondayDate = new Date(REF_DATE);
       mondayDate.setDate(mondayDate.getDate() + (weeksDiff * 7));
@@ -593,10 +609,10 @@
         const dayKey = formatDateKey(dayDate);
         const dayMeals = getMealData(dayKey);
 
-        const pDej = (dayMeals['Petit-déjeuner'] || []).reduce((s, x) => s + x.kcalTotal, 0);
-        const dej = (dayMeals['Déjeuner'] || []).reduce((s, x) => s + x.kcalTotal, 0);
-        const col = (dayMeals['Collation'] || []).reduce((s, x) => s + x.kcalTotal, 0);
-        const din = (dayMeals['Dîner'] || []).reduce((s, x) => s + x.kcalTotal, 0);
+        const pDej = (dayMeals['Petit-déjeuner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
+        const dej = (dayMeals['Déjeuner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
+        const col = (dayMeals['Collation'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
+        const din = (dayMeals['Dîner'] || []).reduce((s, x) => s + (x.kcalTotal || x.kcal || 0), 0);
         const dayTotal = pDej + dej + col + din;
         totalSemaine += dayTotal;
 
@@ -666,8 +682,8 @@
           for (let key in donnees) {
             localStorage.setItem(key, donnees[key]);
           }
-          alert('✅ Sauvegarde restaurée avec succès ! La page va se recharger.');
-          location.reload();
+          alert('✅ Sauvegarde restaurée avec succès !');
+          updateAppView();
         } catch (err) {
           alert('❌ Erreur lors de la lecture du fichier de sauvegarde.');
         }
