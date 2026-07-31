@@ -23,7 +23,7 @@
             background: var(--bg); 
             background-attachment: fixed;
             color: var(--text); 
-            padding-bottom: 90px; 
+            padding-bottom: 110px; 
             min-height: 100vh;
         }
 
@@ -81,10 +81,68 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .navbar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -3px 12px rgba(0,0,0,0.1); border-top: 1px solid var(--card-border); max-width: 500px; margin: 0 auto; z-index: 1000; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.7rem; color: #888; border: none; background: none; cursor: pointer; width: 20%; }
-        .nav-item.active { color: var(--primary); font-weight: bold; }
-        .nav-icon { font-size: 1.2rem; margin-bottom: 2px; }
+        /* NAVBAR AVEC BOUTONS CIRCULAIRES AGRANDIS */
+        .navbar { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: var(--card-bg); 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center;
+            padding: 8px 5px 12px 5px; 
+            box-shadow: 0 -4px 15px rgba(142, 0, 56, 0.15); 
+            border-top: 2px solid var(--card-border); 
+            max-width: 500px; 
+            margin: 0 auto; 
+            z-index: 1000; 
+        }
+        
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            font-size: 0.85rem; 
+            font-weight: 600;
+            color: #666; 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            width: 20%; 
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .nav-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-icon { 
+            font-size: 1.4rem; 
+        }
+
+        /* Onglet actif */
+        .nav-item.active { 
+            color: var(--primary-dark); 
+            font-weight: bold; 
+        }
+
+        .nav-item.active .nav-circle {
+            background: var(--primary);
+            border-color: var(--primary-dark);
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.4);
+        }
 
         .item-list { list-style: none; margin-bottom: 8px; }
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f8bbd0; font-size: 0.85rem; }
@@ -264,26 +322,36 @@
     </div>
 </div>
 
-<!-- NAVBAR -->
+<!-- NAVBAR AVEC CERCLES -->
 <div class="navbar">
     <button class="nav-item active" onclick="switchTab('repas', this)">
-        <span class="nav-icon">🍽️</span>
+        <div class="nav-circle">
+            <span class="nav-icon">🍽️</span>
+        </div>
         <span>Repas</span>
     </button>
     <button class="nav-item" onclick="switchTab('poids', this)">
-        <span class="nav-icon">⚖️</span>
+        <div class="nav-circle">
+            <span class="nav-icon">⚖️</span>
+        </div>
         <span>Poids</span>
     </button>
     <button class="nav-item" onclick="switchTab('activite', this)">
-        <span class="nav-icon">🚶</span>
+        <div class="nav-circle">
+            <span class="nav-icon">🚶</span>
+        </div>
         <span>Activité</span>
     </button>
     <button class="nav-item" onclick="switchTab('aliments', this)">
-        <span class="nav-icon">📖</span>
+        <div class="nav-circle">
+            <span class="nav-icon">📖</span>
+        </div>
         <span>Aliments</span>
     </button>
     <button class="nav-item" onclick="switchTab('recap', this)">
-        <span class="nav-icon">📊</span>
+        <div class="nav-circle">
+            <span class="nav-icon">📊</span>
+        </div>
         <span>Récap'</span>
     </button>
 </div>
@@ -521,12 +589,11 @@
         loadWeight();
     }
 
-    // Fonction pour dessiner une petite fleur sur Canvas
+    // Dessin d'une petite fleur sur Canvas
     function drawFlower(ctx, x, y, size) {
         const petals = 5;
         const radius = size;
         
-        // Pétales roses
         ctx.fillStyle = '#e91e63';
         for (let i = 0; i < petals; i++) {
             const angle = (i * 2 * Math.PI) / petals;
@@ -537,7 +604,6 @@
             ctx.fill();
         }
 
-        // Cœur de la fleur (jaune doré)
         ctx.beginPath();
         ctx.arc(x, y, radius * 0.8, 0, Math.PI * 2);
         ctx.fillStyle = '#ffca28';
@@ -595,7 +661,6 @@
         });
         ctx.stroke();
 
-        // Remplacement des cercles simples par des petites fleurs
         points.forEach((pt, i) => {
             let x = padding + (i / (points.length - 1)) * graphWidth;
             let y = graphHeight - ((pt.weight - minW) / (maxW - minW)) * graphHeight + 15;
