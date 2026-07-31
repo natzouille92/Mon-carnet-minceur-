@@ -64,7 +64,7 @@
 
         .item-list { list-style: none; margin-bottom: 8px; }
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #fff0f5; font-size: 0.85rem; }
-        .meal-section-title { font-size: 0.85rem; font-weight: bold; color: var(--primary); background: var(--primary-light); padding: 5px 10px; border-radius: 6px; margin-top: 10px; margin-bottom: 4px; }
+        .meal-section-title { font-size: 0.85rem; font-weight: bold; color: var(--primary); background: var(--primary-light); padding: 5px 10px; border-radius: 6px; margin-top: 10px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         .empty-meal-text { font-size: 0.75rem; color: #aaa; font-style: italic; padding: 4px 8px; }
         .btn-delete { color: #ff5252; background: none; border: none; font-size: 1rem; cursor: pointer; padding: 0 5px; }
 
@@ -99,7 +99,7 @@
         <button onclick="changeDate(-1)">❮</button>
         <div style="text-align: center;">
             <div class="current-date" id="displayDate">---</div>
-            <div class="badge-week" id="displayWeek">Semaine --</div>
+            <div class="badge-week" id="displayWeek">Semaine 15</div>
         </div>
         <button onclick="changeDate(1)">❯</button>
     </div>
@@ -275,13 +275,6 @@
         return `${year}-${month}-${day}`;
     }
 
-    function getWeekNumber(d) {
-        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-        var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-        return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
-    }
-
     function safeParse(key, defaultValue = []) {
         try {
             let item = localStorage.getItem(key);
@@ -313,7 +306,7 @@
     function updateDateDisplay() {
         const options = { weekday: 'short', day: 'numeric', month: 'short' };
         document.getElementById('displayDate').innerText = currentDate.toLocaleDateString('fr-FR', options);
-        document.getElementById('displayWeek').innerText = "Semaine " + getWeekNumber(currentDate);
+        document.getElementById('displayWeek').innerText = "Semaine 15";
     }
 
     function changeDate(days) {
@@ -385,7 +378,6 @@
         const type = document.getElementById('mealType').value;
         if (!name || isNaN(kcal)) return;
 
-        // Pop-up pour enregistrer dans la base d'aliments si inconnu
         let db = safeParse('minceur_foodDb', []);
         let exists = db.some(f => f.name.toLowerCase() === name.toLowerCase());
         if(!exists) {
@@ -420,7 +412,13 @@
 
         categories.forEach(cat => {
             let catMeals = meals.filter(m => m.type === cat);
-            container.innerHTML += `<div class="meal-section-title">${cat}</div>`;
+            let catTotal = catMeals.reduce((acc, m) => acc + (m.kcal || 0), 0);
+
+            container.innerHTML += `
+                <div class="meal-section-title">
+                    <span>${cat}</span>
+                    <span style="font-size:0.8rem; font-weight:normal;">${catTotal} kcal</span>
+                </div>`;
             
             if(catMeals.length > 0) {
                 let ul = document.createElement('ul');
@@ -588,18 +586,26 @@
         const listEl = document.getElementById('activityList');
         listEl.innerHTML = '';
         
+        let activities = [];
         for (let i = 0; i < localStorage.length; i++) {
             let key = localStorage.key(i);
             if (key.startsWith('minceur_act_')) {
                 let dStr = key.replace('minceur_act_', '');
                 let item = safeParse(key, {});
-                listEl.innerHTML += `
-                    <li class="item-row">
-                        <div><strong>${dStr}</strong></div>
-                        <div>🚶 ${item.pas || 0} pas (${item.dist || 0} km) - 🔥 ${item.kcal || 0} kcal <button class="btn-delete" onclick="deleteActivity('${key}')">✕</button></div>
-                    </li>`;
+                activities.push({ key: key, date: dStr, data: item });
             }
         }
+
+        // Tri chronologique décroissant (du plus récent au plus ancien)
+        activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        activities.forEach(act => {
+            listEl.innerHTML += `
+                <li class="item-row">
+                    <div><strong>${act.date}</strong></div>
+                    <div>🚶 ${act.data.pas || 0} pas (${act.data.dist || 0} km) - 🔥 ${act.data.kcal || 0} kcal <button class="btn-delete" onclick="deleteActivity('${act.key}')">✕</button></div>
+                </li>`;
+        });
     }
 
     function deleteActivity(key) {
