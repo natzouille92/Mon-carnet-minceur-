@@ -25,7 +25,7 @@
         .header h1 { font-size: 1.2rem; color: var(--primary); margin-bottom: 5px; }
         .header p { font-size: 0.85rem; color: var(--primary-dark); font-style: italic; }
 
-        .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #ffe6ed; }
+        .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #ffe6ed; position: relative; }
         .card-title { font-size: 1rem; font-weight: bold; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
         .date-nav { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px; }
@@ -37,10 +37,15 @@
         .circle-progress { width: 80px; height: 80px; border-radius: 50%; background: conic-gradient(var(--primary) 0deg, #f0f0f0 0deg); display: flex; align-items: center; justify-content: center; position: relative; }
         .circle-inner { width: 64px; height: 64px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; color: var(--primary); }
 
-        .form-group { margin-bottom: 10px; }
+        .form-group { margin-bottom: 10px; position: relative; }
         .form-group label { display: block; font-size: 0.8rem; color: var(--text-light); margin-bottom: 4px; }
         input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #ffccd5; border-radius: 10px; font-size: 0.9rem; outline: none; background: #fffafc; }
         input:focus { border-color: var(--primary); }
+
+        /* Menu Déroulant Autocomplétion Custom */
+        .suggestions-box { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ffccd5; border-radius: 10px; max-height: 150px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
+        .suggestion-item { padding: 8px 12px; font-size: 0.85rem; cursor: pointer; border-bottom: 1px solid #fff0f5; }
+        .suggestion-item:hover { background: var(--primary-light); color: var(--primary); }
 
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
@@ -67,7 +72,7 @@
         .stat-value { font-size: 1.1rem; font-weight: bold; color: var(--primary); }
         .stat-label { font-size: 0.7rem; color: var(--text-light); }
 
-        datalist { display: none; }
+        canvas { width: 100% !important; height: 200px !important; }
     </style>
 </head>
 <body>
@@ -112,8 +117,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <input type="text" id="foodNameInput" list="foodSuggestions" placeholder="Rechercher ou entrer un aliment..." oninput="onFoodSelect()">
-                <datalist id="foodSuggestions"></datalist>
+                <input type="text" id="foodNameInput" placeholder="Rechercher ou entrer un aliment..." oninput="handleFoodInput()" autocomplete="off">
+                <div id="suggestionsBox" class="suggestions-box"></div>
             </div>
             <div class="grid-2">
                 <div class="form-group">
@@ -140,8 +145,14 @@
                 <button class="btn" onclick="saveWeight()">Enregistrer</button>
             </div>
         </div>
+
         <div class="card">
-            <div class="card-title">📈 Évolution du Poids</div>
+            <div class="card-title">📊 Courbe de Poids (55kg - 85kg)</div>
+            <canvas id="weightChart"></canvas>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📈 Historique du Poids</div>
             <ul class="item-list" id="weightList"></ul>
         </div>
     </div>
@@ -149,7 +160,7 @@
     <!-- TAB ACTIVITÉ -->
     <div id="tab-activite" class="tab-content">
         <div class="card">
-            <div class="card-title">🚶 Marche & Activité</div>
+            <div class="card-title">🚶 Marche & Activité du jour</div>
             <div class="grid-3" style="margin-bottom: 10px;">
                 <div class="stat-box">
                     <div class="stat-value" id="dispPas">0</div>
@@ -189,7 +200,7 @@
                 <input type="text" id="dbName" placeholder="Nom de l'aliment">
             </div>
             <div class="grid-2" style="margin-bottom: 10px;">
-                <input type="number" id="dbKcal" placeholder="Kcal pour 100g/portion">
+                <input type="number" id="dbKcal" placeholder="Kcal pour portion">
                 <button class="btn" onclick="addFoodToDb()">Ajouter</button>
             </div>
         </div>
@@ -273,13 +284,8 @@
         try {
             let item = localStorage.getItem(key);
             if (!item) return defaultValue;
-            // Correction des antislashs ou double encodage
             while (typeof item === 'string') {
-                try {
-                    item = JSON.parse(item);
-                } catch(e) {
-                    break;
-                }
+                try { item = JSON.parse(item); } catch(e) { break; }
             }
             return item || defaultValue;
         } catch (e) {
@@ -327,12 +333,54 @@
         if(tabName === 'recap') loadRecap();
     }
 
+    // --- AUTOCOMPLÉTION & FENÊTRE POP-UP ALIMENTS ---
+    function handleFoodInput() {
+        const val = document.getElementById('foodNameInput').value.trim().toLowerCase();
+        const box = document.getElementById('suggestionsBox');
+        box.innerHTML = '';
+
+        if(val.length < 2) {
+            box.style.display = 'none';
+            return;
+        }
+
+        let db = safeParse('minceur_foodDb', []);
+        let matches = db.filter(f => f.name.toLowerCase().includes(val));
+
+        if(matches.length > 0) {
+            matches.forEach(f => {
+                let div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = `<strong>${f.name}</strong> (${f.kcal} kcal)`;
+                div.onclick = function() {
+                    document.getElementById('foodNameInput').value = f.name;
+                    document.getElementById('foodKcalInput').value = f.kcal;
+                    box.style.display = 'none';
+                };
+                box.appendChild(div);
+            });
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
+        }
+    }
+
     // --- REPAS ---
     function addMeal() {
         const name = document.getElementById('foodNameInput').value.trim();
         const kcal = parseInt(document.getElementById('foodKcalInput').value);
         const type = document.getElementById('mealType').value;
         if (!name || isNaN(kcal)) return;
+
+        // Pop-up pour enregistrer dans la base d'aliments si inconnu
+        let db = safeParse('minceur_foodDb', []);
+        let exists = db.some(f => f.name.toLowerCase() === name.toLowerCase());
+        if(!exists) {
+            if(confirm(`Voulez-vous ajouter "${name}" (${kcal} kcal) à votre base d'aliments permanente ?`)) {
+                db.push({ name, kcal });
+                localStorage.setItem('minceur_foodDb', JSON.stringify(db));
+            }
+        }
 
         const dateStr = formatDate(currentDate);
         let meals = safeParse('minceur_meals_' + dateStr, []);
@@ -341,6 +389,7 @@
 
         document.getElementById('foodNameInput').value = '';
         document.getElementById('foodKcalInput').value = '';
+        document.getElementById('suggestionsBox').style.display = 'none';
         loadDayData();
     }
 
@@ -393,16 +442,7 @@
         loadDayData();
     }
 
-    function onFoodSelect() {
-        const inputVal = document.getElementById('foodNameInput').value;
-        let db = safeParse('minceur_foodDb', []);
-        let found = db.find(f => f.name.toLowerCase() === inputVal.toLowerCase());
-        if(found) {
-            document.getElementById('foodKcalInput').value = found.kcal;
-        }
-    }
-
-    // --- POIDS ---
+    // --- POIDS & GRAPHIQUE ---
     function saveWeight() {
         const val = parseFloat(document.getElementById('weightInput').value);
         if (isNaN(val)) return;
@@ -411,7 +451,7 @@
         
         log = log.filter(w => w.date !== dateStr);
         log.push({ date: dateStr, weight: val });
-        log.sort((a,b) => new Date(b.date) - new Date(a.date));
+        log.sort((a,b) => new Date(a.date) - new Date(b.date));
 
         localStorage.setItem('minceur_weightLog', JSON.stringify(log));
         document.getElementById('weightInput').value = '';
@@ -420,10 +460,92 @@
 
     function loadWeight() {
         let log = safeParse('minceur_weightLog', []);
+        log.sort((a,b) => new Date(b.date) - new Date(a.date));
+
         const listEl = document.getElementById('weightList');
         listEl.innerHTML = '';
-        log.forEach((w) => {
-            listEl.innerHTML += `<li class="item-row"><div>${w.date}</div><div><strong>${w.weight} kg</strong></div></li>`;
+        log.forEach((w, idx) => {
+            listEl.innerHTML += `
+                <li class="item-row">
+                    <div>${w.date}</div>
+                    <div><strong>${w.weight} kg</strong> <button class="btn-delete" onclick="deleteWeight(${idx})">✕</button></div>
+                </li>`;
+        });
+
+        drawWeightChart(log);
+    }
+
+    function deleteWeight(idx) {
+        let log = safeParse('minceur_weightLog', []);
+        log.sort((a,b) => new Date(b.date) - new Date(a.date));
+        log.splice(idx, 1);
+        localStorage.setItem('minceur_weightLog', JSON.stringify(log));
+        loadWeight();
+    }
+
+    function drawWeightChart(logData) {
+        const canvas = document.getElementById('weightChart');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        // Redimensionnement adapté
+        canvas.width = canvas.parentElement.clientWidth - 30;
+        canvas.height = 200;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        let points = [...logData].sort((a,b) => new Date(a.date) - new Date(b.date));
+        if(points.length < 2) {
+            ctx.fillStyle = '#888';
+            ctx.font = '12px sans-serif';
+            ctx.fillText("Ajoutez au moins 2 mesures pour afficher la courbe.", 20, 100);
+            return;
+        }
+
+        const minW = 55;
+        const maxW = 85;
+        const padding = 35;
+        const graphWidth = canvas.width - padding - 10;
+        const graphHeight = canvas.height - 30;
+
+        // Tracé des lignes d'échelle (Grid)
+        ctx.strokeStyle = '#ffe6ed';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#c2185b';
+        ctx.font = '10px sans-serif';
+
+        for(let w = minW; w <= maxW; w += 5) {
+            let y = graphHeight - ((w - minW) / (maxW - minW)) * graphHeight + 15;
+            ctx.beginPath();
+            ctx.moveTo(padding, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+            ctx.fillText(w + 'kg', 5, y + 4);
+        }
+
+        // Tracé de la courbe
+        ctx.beginPath();
+        ctx.strokeStyle = '#e91e63';
+        ctx.lineWidth = 3;
+
+        points.forEach((pt, i) => {
+            let x = padding + (i / (points.length - 1)) * graphWidth;
+            let y = graphHeight - ((pt.weight - minW) / (maxW - minW)) * graphHeight + 15;
+
+            if(i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        // Points sur la courbe
+        points.forEach((pt, i) => {
+            let x = padding + (i / (points.length - 1)) * graphWidth;
+            let y = graphHeight - ((pt.weight - minW) / (maxW - minW)) * graphHeight + 15;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#c2185b';
+            ctx.fill();
         });
     }
 
@@ -462,10 +584,15 @@
                 listEl.innerHTML += `
                     <li class="item-row">
                         <div><strong>${dStr}</strong></div>
-                        <div>🚶 ${item.pas || 0} pas (${item.dist || 0} km) - 🔥 ${item.kcal || 0} kcal</div>
+                        <div>🚶 ${item.pas || 0} pas (${item.dist || 0} km) - 🔥 ${item.kcal || 0} kcal <button class="btn-delete" onclick="deleteActivity('${key}')">✕</button></div>
                     </li>`;
             }
         }
+    }
+
+    function deleteActivity(key) {
+        localStorage.removeItem(key);
+        loadActivity();
     }
 
     // --- ALIMENTS ---
@@ -486,9 +613,7 @@
     function loadFoodDb() {
         let db = safeParse('minceur_foodDb', []);
         const listEl = document.getElementById('customFoodList');
-        const dataList = document.getElementById('foodSuggestions');
         listEl.innerHTML = '';
-        dataList.innerHTML = '';
 
         db.forEach((f, idx) => {
             listEl.innerHTML += `
@@ -496,7 +621,6 @@
                     <div>${f.name}</div>
                     <div>${f.kcal} kcal <button class="btn-delete" onclick="deleteFoodDb(${idx})">✕</button></div>
                 </li>`;
-            dataList.innerHTML += `<option value="${f.name}">`;
         });
     }
 
@@ -516,7 +640,7 @@
 
         for(let i = 0; i < 7; i++) {
             let tempDate = new Date(currentDate);
-            tempDate.setDate(tempDate.getDate() - tempDate.getDay() + 1 + i); // Lundi à Dimanche
+            tempDate.setDate(tempDate.getDate() - tempDate.getDay() + 1 + i);
             let dStr = formatDate(tempDate);
 
             let meals = safeParse('minceur_meals_' + dStr, []);
@@ -533,7 +657,7 @@
             detailsHtml += `
                 <li class="item-row">
                     <div>${tempDate.toLocaleDateString('fr-FR', {weekday: 'short', day: 'numeric'})}</div>
-                    <div><strong>${dayKcal} kcal</strong> consumed</div>
+                    <div><strong>${dayKcal} kcal</strong></div>
                 </li>`;
         }
         detailsHtml += '</ul>';
@@ -544,7 +668,7 @@
         document.getElementById('recapWeekDetails').innerHTML = detailsHtml;
     }
 
-    // --- IMPORT / EXPORT AVEC NETTOYAGE ---
+    // --- IMPORT / EXPORT ---
     function exportData() {
         let data = {};
         for (let i = 0; i < localStorage.length; i++) {
@@ -567,14 +691,7 @@
         let reader = new FileReader();
         reader.onload = function(e) {
             try {
-                let rawText = e.target.result;
-                let data = JSON.parse(rawText);
-
-                // Effacement des anciennes clés minceur pour repartir sur du propre
-                Object.keys(localStorage).forEach(k => {
-                    if(k.startsWith('minceur_')) localStorage.removeItem(k);
-                });
-
+                let data = JSON.parse(e.target.result);
                 Object.keys(data).forEach(key => {
                     let val = data[key];
                     if (typeof val === 'object') {
@@ -583,11 +700,10 @@
                         localStorage.setItem(key, val);
                     }
                 });
-
-                alert('Restauration terminée avec succès ! La page va se recharger.');
+                alert('Restauration réussie ! La page va se recharger.');
                 window.location.reload();
             } catch (err) {
-                alert('Erreur lors de la lecture du fichier : ' + err.message);
+                alert('Erreur lors de l\'importation : ' + err.message);
             }
         };
         reader.readAsText(file);
