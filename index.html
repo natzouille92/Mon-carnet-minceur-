@@ -521,6 +521,29 @@
         loadWeight();
     }
 
+    // Fonction pour dessiner une petite fleur sur Canvas
+    function drawFlower(ctx, x, y, size) {
+        const petals = 5;
+        const radius = size;
+        
+        // Pétales roses
+        ctx.fillStyle = '#e91e63';
+        for (let i = 0; i < petals; i++) {
+            const angle = (i * 2 * Math.PI) / petals;
+            const px = x + Math.cos(angle) * radius;
+            const py = y + Math.sin(angle) * radius;
+            ctx.beginPath();
+            ctx.arc(px, py, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Cœur de la fleur (jaune doré)
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffca28';
+        ctx.fill();
+    }
+
     function drawWeightChart(logData) {
         const canvas = document.getElementById('weightChart');
         if(!canvas) return;
@@ -572,14 +595,12 @@
         });
         ctx.stroke();
 
+        // Remplacement des cercles simples par des petites fleurs
         points.forEach((pt, i) => {
             let x = padding + (i / (points.length - 1)) * graphWidth;
             let y = graphHeight - ((pt.weight - minW) / (maxW - minW)) * graphHeight + 15;
 
-            ctx.beginPath();
-            ctx.arc(x, y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = '#8e0038';
-            ctx.fill();
+            drawFlower(ctx, x, y, 3.5);
         });
     }
 
