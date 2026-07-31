@@ -42,7 +42,6 @@
         input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #ffccd5; border-radius: 10px; font-size: 0.9rem; outline: none; background: #fffafc; }
         input:focus { border-color: var(--primary); }
 
-        /* Menu Déroulant Autocomplétion Custom */
         .suggestions-box { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ffccd5; border-radius: 10px; max-height: 150px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: none; }
         .suggestion-item { padding: 8px 12px; font-size: 0.85rem; cursor: pointer; border-bottom: 1px solid #fff0f5; }
         .suggestion-item:hover { background: var(--primary-light); color: var(--primary); }
@@ -63,9 +62,10 @@
         .nav-item.active { color: var(--primary); font-weight: bold; }
         .nav-icon { font-size: 1.2rem; margin-bottom: 2px; }
 
-        .item-list { list-style: none; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #fff0f5; font-size: 0.85rem; }
-        .meal-section-title { font-size: 0.85rem; font-weight: bold; color: var(--primary); background: var(--primary-light); padding: 4px 8px; border-radius: 6px; margin-top: 10px; margin-bottom: 4px; }
+        .item-list { list-style: none; margin-bottom: 8px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #fff0f5; font-size: 0.85rem; }
+        .meal-section-title { font-size: 0.85rem; font-weight: bold; color: var(--primary); background: var(--primary-light); padding: 5px 10px; border-radius: 6px; margin-top: 10px; margin-bottom: 4px; }
+        .empty-meal-text { font-size: 0.75rem; color: #aaa; font-style: italic; padding: 4px 8px; }
         .btn-delete { color: #ff5252; background: none; border: none; font-size: 1rem; cursor: pointer; padding: 0 5px; }
 
         .stat-box { text-align: center; padding: 10px; background: #fffafc; border-radius: 10px; border: 1px solid #ffe6ed; }
@@ -122,12 +122,13 @@
             </div>
             <div class="grid-2">
                 <div class="form-group">
-                    <input type="number" id="foodKcalInput" placeholder="Calories (kcal)">
+                    <input type="number" id="foodQtyInput" placeholder="Quantité (g)" oninput="recalcKcal()">
                 </div>
                 <div class="form-group">
-                    <button class="btn" onclick="addMeal()">Ajouter</button>
+                    <input type="number" id="foodKcalInput" placeholder="Calories (kcal)">
                 </div>
             </div>
+            <button class="btn" onclick="addMeal()">Ajouter au Repas</button>
         </div>
 
         <div class="card">
@@ -195,12 +196,12 @@
     <!-- TAB ALIMENTS -->
     <div id="tab-aliments" class="tab-content">
         <div class="card">
-            <div class="card-title">🍏 Base d'Aliments</div>
+            <div class="card-title">🍏 Base d'Aliments (Pour 100g)</div>
             <div class="form-group">
                 <input type="text" id="dbName" placeholder="Nom de l'aliment">
             </div>
             <div class="grid-2" style="margin-bottom: 10px;">
-                <input type="number" id="dbKcal" placeholder="Kcal pour portion">
+                <input type="number" id="dbKcal" placeholder="Kcal pour 100g">
                 <button class="btn" onclick="addFoodToDb()">Ajouter</button>
             </div>
         </div>
@@ -265,6 +266,7 @@
 
 <script>
     let currentDate = new Date();
+    let selectedFoodKcal100g = null;
 
     function formatDate(d) {
         let year = d.getFullYear();
@@ -338,6 +340,7 @@
         const val = document.getElementById('foodNameInput').value.trim().toLowerCase();
         const box = document.getElementById('suggestionsBox');
         box.innerHTML = '';
+        selectedFoodKcal100g = null;
 
         if(val.length < 2) {
             box.style.display = 'none';
@@ -351,10 +354,11 @@
             matches.forEach(f => {
                 let div = document.createElement('div');
                 div.className = 'suggestion-item';
-                div.innerHTML = `<strong>${f.name}</strong> (${f.kcal} kcal)`;
+                div.innerHTML = `<strong>${f.name}</strong> (${f.kcal} kcal / 100g)`;
                 div.onclick = function() {
                     document.getElementById('foodNameInput').value = f.name;
-                    document.getElementById('foodKcalInput').value = f.kcal;
+                    selectedFoodKcal100g = f.kcal;
+                    recalcKcal();
                     box.style.display = 'none';
                 };
                 box.appendChild(div);
@@ -365,10 +369,19 @@
         }
     }
 
+    function recalcKcal() {
+        let qty = parseFloat(document.getElementById('foodQtyInput').value);
+        if(selectedFoodKcal100g && !isNaN(qty)) {
+            let calculated = Math.round((selectedFoodKcal100g * qty) / 100);
+            document.getElementById('foodKcalInput').value = calculated;
+        }
+    }
+
     // --- REPAS ---
     function addMeal() {
         const name = document.getElementById('foodNameInput').value.trim();
         const kcal = parseInt(document.getElementById('foodKcalInput').value);
+        const qty = parseInt(document.getElementById('foodQtyInput').value) || 0;
         const type = document.getElementById('mealType').value;
         if (!name || isNaN(kcal)) return;
 
@@ -376,20 +389,23 @@
         let db = safeParse('minceur_foodDb', []);
         let exists = db.some(f => f.name.toLowerCase() === name.toLowerCase());
         if(!exists) {
-            if(confirm(`Voulez-vous ajouter "${name}" (${kcal} kcal) à votre base d'aliments permanente ?`)) {
-                db.push({ name, kcal });
+            let kcal100 = qty > 0 ? Math.round((kcal / qty) * 100) : kcal;
+            if(confirm(`Voulez-vous ajouter "${name}" (${kcal100} kcal/100g) à votre base d'aliments permanente ?`)) {
+                db.push({ name, kcal: kcal100 });
                 localStorage.setItem('minceur_foodDb', JSON.stringify(db));
             }
         }
 
         const dateStr = formatDate(currentDate);
         let meals = safeParse('minceur_meals_' + dateStr, []);
-        meals.push({ name, kcal, type });
+        meals.push({ name, kcal, qty, type });
         localStorage.setItem('minceur_meals_' + dateStr, JSON.stringify(meals));
 
         document.getElementById('foodNameInput').value = '';
         document.getElementById('foodKcalInput').value = '';
+        document.getElementById('foodQtyInput').value = '';
         document.getElementById('suggestionsBox').style.display = 'none';
+        selectedFoodKcal100g = null;
         loadDayData();
     }
 
@@ -404,26 +420,26 @@
 
         categories.forEach(cat => {
             let catMeals = meals.filter(m => m.type === cat);
+            container.innerHTML += `<div class="meal-section-title">${cat}</div>`;
+            
             if(catMeals.length > 0) {
-                container.innerHTML += `<div class="meal-section-title">${cat}</div>`;
                 let ul = document.createElement('ul');
                 ul.className = 'item-list';
                 catMeals.forEach((m) => {
                     total += m.kcal;
                     let globalIdx = meals.indexOf(m);
+                    let qtyStr = m.qty ? ` (${m.qty}g)` : '';
                     ul.innerHTML += `
                         <li class="item-row">
-                            <div>${m.name}</div>
+                            <div>${m.name}${qtyStr}</div>
                             <div>${m.kcal} kcal <button class="btn-delete" onclick="deleteMeal(${globalIdx})">✕</button></div>
                         </li>`;
                 });
                 container.appendChild(ul);
+            } else {
+                container.innerHTML += `<div class="empty-meal-text">Aucun aliment enregistré.</div>`;
             }
         });
-
-        if(meals.length === 0) {
-            container.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-light); text-align: center; padding: 10px;">Aucun repas enregistré pour ce jour.</p>`;
-        }
 
         const goal = parseInt(document.getElementById('goalInput').value) || 1300;
         document.getElementById('consumedKcal').innerText = total;
@@ -488,7 +504,6 @@
         if(!canvas) return;
         const ctx = canvas.getContext('2d');
         
-        // Redimensionnement adapté
         canvas.width = canvas.parentElement.clientWidth - 30;
         canvas.height = 200;
 
@@ -508,7 +523,6 @@
         const graphWidth = canvas.width - padding - 10;
         const graphHeight = canvas.height - 30;
 
-        // Tracé des lignes d'échelle (Grid)
         ctx.strokeStyle = '#ffe6ed';
         ctx.lineWidth = 1;
         ctx.fillStyle = '#c2185b';
@@ -523,7 +537,6 @@
             ctx.fillText(w + 'kg', 5, y + 4);
         }
 
-        // Tracé de la courbe
         ctx.beginPath();
         ctx.strokeStyle = '#e91e63';
         ctx.lineWidth = 3;
@@ -537,7 +550,6 @@
         });
         ctx.stroke();
 
-        // Points sur la courbe
         points.forEach((pt, i) => {
             let x = padding + (i / (points.length - 1)) * graphWidth;
             let y = graphHeight - ((pt.weight - minW) / (maxW - minW)) * graphHeight + 15;
@@ -619,7 +631,7 @@
             listEl.innerHTML += `
                 <li class="item-row">
                     <div>${f.name}</div>
-                    <div>${f.kcal} kcal <button class="btn-delete" onclick="deleteFoodDb(${idx})">✕</button></div>
+                    <div>${f.kcal} kcal / 100g <button class="btn-delete" onclick="deleteFoodDb(${idx})">✕</button></div>
                 </li>`;
         });
     }
