@@ -81,7 +81,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* NAVBAR AVEC BOUTONS CIRCULAIRES AGRANDIS */
+        /* NAVBAR AVEC BOUTONS CIRCULAIRES */
         .navbar { 
             position: fixed; 
             bottom: 0; 
@@ -131,7 +131,6 @@
             font-size: 1.4rem; 
         }
 
-        /* Onglet actif */
         .nav-item.active { 
             color: var(--primary-dark); 
             font-weight: bold; 
@@ -181,7 +180,7 @@
         <button onclick="changeDate(-1)">❮</button>
         <div style="text-align: center;">
             <div class="current-date" id="displayDate">---</div>
-            <div class="badge-week" id="displayWeek">Semaine 15</div>
+            <div class="badge-week" id="displayWeek">Semaine --</div>
         </div>
         <button onclick="changeDate(1)">❯</button>
     </div>
@@ -360,6 +359,10 @@
     let currentDate = new Date();
     let selectedFoodKcal100g = null;
 
+    // Date du début du suivi : Lundi 27 Juillet (Semaine 15)
+    const START_DATE = new Date(2026, 6, 27); // 27 Juillet 2026
+    const START_WEEK_NUM = 15;
+
     function formatDate(d) {
         let year = d.getFullYear();
         let month = String(d.getMonth() + 1).padStart(2, '0');
@@ -380,6 +383,21 @@
         }
     }
 
+    // Calcul dynamique du numéro de semaine selon la date sélectionnée
+    function getWeekNumber(date) {
+        let target = new Date(date.getTime());
+        target.setHours(0,0,0,0);
+        
+        let start = new Date(START_DATE.getTime());
+        start.setHours(0,0,0,0);
+        
+        // Calcule le nombre de semaines écoulées depuis le lundi 27 juillet
+        let diffDays = Math.floor((target - start) / (1000 * 60 * 60 * 24));
+        let weeksDiff = Math.floor(diffDays / 7);
+        
+        return START_WEEK_NUM + weeksDiff;
+    }
+
     function init() {
         updateDateDisplay();
         loadDayData();
@@ -398,7 +416,9 @@
     function updateDateDisplay() {
         const options = { weekday: 'short', day: 'numeric', month: 'short' };
         document.getElementById('displayDate').innerText = currentDate.toLocaleDateString('fr-FR', options);
-        document.getElementById('displayWeek').innerText = "Semaine 15";
+        
+        const weekNum = getWeekNumber(currentDate);
+        document.getElementById('displayWeek').innerText = "Semaine " + weekNum;
     }
 
     function changeDate(days) {
@@ -589,7 +609,6 @@
         loadWeight();
     }
 
-    // Dessin d'une petite fleur sur Canvas
     function drawFlower(ctx, x, y, size) {
         const petals = 5;
         const radius = size;
